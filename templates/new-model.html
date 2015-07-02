@@ -1,0 +1,90 @@
+{% include 'header.html' %}
+<link href="/static/dashboard.css" rel="stylesheet">
+
+
+{% include 'navbar.html' %}
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li><a href="admin">Home<span class="sr-only">(current)</span></a></li>
+            <li class="active"><a href="../admin-models">Manage models</a></li>
+            <li><a href="../admin-collections">Manage collections</a></li>
+            <li><a href="../admin-orders">Manage orders</a></li>
+            <li><a href="../admin-users">Manage users</a></li>
+          </ul>
+        </div>
+        <div class="col-md-9 col-md-offset-2 main">
+          <div class="page-header">
+            <a href="/admin">Home</a> / <a href="/admin-models">Models</a> / Add new model
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <form action="/admin-models/add" method="POST">
+
+                <div class="form-group">
+
+                    <label for="model_name_id">Name</label>
+                    <input  class="form-control form-inline" id="model_name_id" name="model_name_field" type="text" placeholder="Name" />
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="description_id">Description</label>
+                    <input class="form-control" id="model_description_id" name="model_description_field" type="text" size="4" placeholder="Description" />
+                </div>
+
+                <div class="form-group">
+
+                    <label for="dimensions_id">Dimensions</label>
+                    <input class="form-control" id="model_dimensions_id" name="model_dimensions_field" type="text" placeholder="Dimensions" />
+                </div>
+                <div class="form-group">
+
+                  <label for="collection_id">Collection</label>
+                  <select class="form-control" id="model_collection_id" name="model_collection_field" type="text">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+
+                    <label for="price_id">Price</label>
+                    <input class="form-control" id="model_price_id" name="model_price_field" type="text" placeholder="00.00" maxlength="6" />
+                </div>
+
+                <div class="form-group">
+
+                    <label for="image1_id">Images</label>
+
+                    <p><input class="btn btn-default" type="file" id="model_image1_id" name="model_datafile1_field" size="40"></p>
+
+                    <p><input class="btn btn-default" type="file" id="model_image2_id" name="model_datafile2_field" size="40"></p>
+
+                    <p><input class="btn btn-default" type="file" id="model_image3_id" name="model_datafile3_field" size="40"></p>
+
+                    <p><input class="btn btn-default" type="file" id="model_image4_id" name="model_datafile4_field" size="40"></p>
+
+                    <p><input class="btn btn-default" type="file" id="model_image5_id" name="model_datafile5_field" size="40">
+
+              <!-- We need a submit button to submit a form! -->
+              <p><input type="submit" placeholder="Save" class="btn btn-success"/> <a href="/admin-models" class="btn btn-default">Back</a>
+
+
+              </form>
+
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

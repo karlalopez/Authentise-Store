@@ -1,0 +1,82 @@
+{% include 'header.html' %}
+<link href="/static/signin.css" rel="stylesheet">
+
+{% include 'navbar.html' %}
+
+
+    <div class="container">
+
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+
+                A problem ocurred with you sign up:
+
+                {{ error }}
+
+            </div>
+        {% endif %}
+
+
+        <form class="form-signin" action="/submit-signup" method="POST">
+          <h2 class="form-signin-heading">Please sign up</h2>
+
+          <label for="email" class="sr-only">Email address</label>
+          <input type="email" id="email" name="email_field" class="form-control" placeholder="Email address" required autofocus>
+          <p>
+          <label for="password" class="sr-only">Password</label>
+          <input type="password" id="pass1" name="password_field" class="form-control" placeholder="Password" required>
+
+          <label for="pass2" class="sr-only">Confirm password</label>
+          <input type="password" id="pass2" name="retype_password" class="form-control" placeholder="Password" required onkeyup="checkPass(); return false;">
+          <p><span id="confirmMessage" class="confirmMessage"></span></p>
+
+          <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+          Or <a href="login">Login</a>.
+
+        </form>
+
+
+
+
+  </div>
+
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="/static/js/ie10-viewport-bug-workaround.js"></script>
+  <script>
+  function checkPass()
+  {
+      //Store the password field objects into variables ...
+      var pass1 = document.getElementById('pass1');
+      var pass2 = document.getElementById('pass2');
+      //Store the Confimation Message Object ...
+      var message = document.getElementById('confirmMessage');
+      //Set the colors we will be using ...
+      var goodColor = "#66cc66";
+      var badColor = "#ff6666";
+      //Compare the values in the password field
+      //and the confirmation field
+      if(pass1.value == pass2.value){
+          //The passwords match.
+          //Set the color to the good color and inform
+          //the user that they have entered the correct password
+          pass2.style.backgroundColor = goodColor;
+          message.style.color = goodColor;
+          message.innerHTML = "Passwords Match!"
+      }else{
+          //The passwords do not match.
+          //Set the color to the bad color and
+          //notify the user.
+          pass2.style.backgroundColor = badColor;
+          message.style.color = badColor;
+          message.innerHTML = "Passwords Do Not Match!"
+      }
+  }
+  </script>
+
+</body>
+</html>

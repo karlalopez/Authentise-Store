@@ -1,0 +1,39 @@
+{% include 'header.html' %}
+<link href="/static/signin.css" rel="stylesheet">
+
+{% include 'navbar.html' %}
+
+
+    <div class="container">
+
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+
+            A problem ocurred with you sign up:
+
+            {{ error }}
+
+        </div>
+        {% endif %}
+
+
+        <!-- Bootstrap: http://getbootstrap.com/css/#forms -->
+
+        <!-- The form action and method correspond to a Flask route -->
+
+        <form class="form-signin" action="/submit-login" method="POST">
+          <h2 class="form-signin-heading">Please log in</h2>
+
+          <label for="email" class="sr-only">Email address</label>
+          <input type="email" id="email" name="email_field" class="form-control" placeholder="Email address" required autofocus>
+          <p>
+          <label for="password" class="sr-only">Password</label>
+          <input type="password" id="password" name="password_field" class="form-control" placeholder="Password" required>
+
+          <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+          Or <a href="signup">Sign up</a>.
+
+        </form>
+
+
+</body>

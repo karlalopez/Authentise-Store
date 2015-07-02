@@ -1,0 +1,50 @@
+{% include 'header.html' %}
+<link href="/static/dashboard.css" rel="stylesheet">
+
+
+{% include 'navbar.html' %}
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li><a href="admin">Home<span class="sr-only">(current)</span></a></li>
+            <li><a href="admin-models">Manage models</a></li>
+            <li><a href="admin-collections">Manage collections</a></li>
+            <li><a href="admin-orders">Manage orders</a></li>
+            <li class="active"><a href="admin-users">Manage users</a></li>
+          </ul>
+        </div>
+        <div class="col-md-9 col-md-offset-2 main">
+          <div class="page-header">
+            <a href="/admin">Home</a> / Users
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <p class="text-right"> <a href="admin-users/new" type="button" class="btn btn-primary">Add new user</a></p>
+              <div class="table-responsive">
+                <table class="table table-striped">
+
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Email</th>
+                      <th>Admin</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for user in users %}
+                      <tr>
+                        <td>{{user.id}}</td>
+                        <td><a href="/admin-users/{{user.id}}">{{user.email}}</td>
+                        <td>{{user.admin}}</td>
+                      </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

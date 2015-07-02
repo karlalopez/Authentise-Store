@@ -1,0 +1,48 @@
+{% include 'header.html' %}
+<link href="/static/dashboard.css" rel="stylesheet">
+
+
+{% include 'navbar.html' %}
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li><a href="admin">Home<span class="sr-only">(current)</span></a></li>
+            <li><a href="../admin-models">Manage models</a></li>
+            <li><a href="../admin-collections">Manage collections</a></li>
+            <li class="active"><a href="../admin-orders">Manage orders</a></li>
+            <li><a href="../admin-users">Manage users</a></li>
+          </ul>
+        </div>
+        <div class="col-md-9 col-md-offset-2 main">
+          <div class="page-header">
+            <a href="/admin">Home</a> / <a href="/admin-collections">Orders</a> / Order ID
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+
+                <div class="form-group">
+
+                    <p>Order ID</p>
+                </div>
+
+                <div class="form-group">
+
+                    <label for="collection_description_id">Description</label>
+                    <input class="form-control" id="order_description_id" name="order_description_field" type="text" size="4" value="order.description" disabled/>
+                </div>
+
+
+              <!-- We need a submit button to submit a form! -->
+              <a href="/admin-orders" class="btn btn-default">Back</a>
+
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
