@@ -8,7 +8,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
-storevev/
+storevenv/
 build/
 develop-eggs/
 dist/
