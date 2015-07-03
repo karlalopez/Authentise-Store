@@ -21,79 +21,66 @@
           </div>
           <div class="row">
             <div class="col-md-12">
-              <form action="/edit/model_id" method="POST">
+              {% if model %}
+                  <form action="/edit/model_id" method="POST">
 
-                <div class="form-group">
+                    <div class="form-group">
 
-                    <label for="name_id">Name</label>
-                    <input  class="form-control form-inline" id="name_id" name="name_field" type="text" value="model.name" />
+                        <label for="name_id">Name</label>
+                        <input  class="form-control form-inline" id="name_id" name="name_field" type="text" value="{{model.name}}" />
 
-                </div>
+                    </div>
 
-                <div class="form-group">
+                    <div class="form-group">
 
-                    <label for="description_id">Description</label>
-                    <input class="form-control" id="description_id" name="description_field" type="text" size="4" value="model.description" />
-                </div>
+                        <label for="description_id">Description</label>
+                        <input class="form-control" id="description_id" name="description_field" type="text" size="4" value="{{model.description}}" />
+                    </div>
 
-                <div class="form-group">
+                    <div class="form-group">
 
-                    <label for="dimensions_id">Dimensions</label>
-                    <input class="form-control" id="dimensions_id" name="dimensions_field" type="text" value="model.dimensions" />
-                </div>
-                <div class="form-group">
+                        <label for="dimensions_id">Dimensions</label>
+                        <input class="form-control" id="dimensions_id" name="dimensions_field" type="text" value="{{model.dimensions}}" />
+                    </div>
+                    <div class="form-group">
+                      <label for="collection_id">Collection</label>
+                      <select class="form-control" id="collection_id" name="collection_field" type="text">
+                        {% for collection in collections %}
+                          {% if collection.id == model.collection_id %}
+                            <option selected>{{ collection.name }}</option>
+                          {% else %}
+                            <option>{{ collection.name }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                    </div>
 
-                  <label for="collection_id">Collection</label>
-                  <select class="form-control" id="collection_id" name="collection_field" type="text">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                  </select>
-                </div>
+                    <div class="form-group">
+                        <label for="price_id">Price</label>
+                        <input class="form-control" id="price_id" name="price_field" type="text" size="4" value="{{model.price}}" maxlength="6" size="6" />
+                    </div>
+                    <div class="form-group">
 
-                <div class="form-group">
-                    <label for="price_id">Price</label>
-                    <input class="form-control" id="price_id" name="price_field" type="text" size="4" value="model.price" maxlength="6" size="6" />
-                </div>
-                <div class="form-group">
+                        <label for="popularity_id">Popularity</label>
+                        <input class="form-control" id="popularity_id" name="popularity_field" type="text" value="{{model.popularity}}" disabled="" />
 
-                    <label for="popularity_id">Popularity</label>
-                    <input class="form-control" id="popularity_id" name="popularity_field" type="text" value="model.popularity" disabled="" />
+                    </div>
+                    {% if images %}
+                      {% for image in images %}
+                        <div class="form-inline"><p>
+                            <label for="popularity_id">Image {{loop.index}}</label>
+                            <input class="form-control" id="image{{loop.index}}_id" name="image1_field" type="text" value="{{image.path}}" disabled="" />
+                            <input class="btn btn-default form-control" type="file" name="datafile" size="40">
+                        </div>
+                      {% endfor%}
+                    {% endif %}
 
-                </div>
-                <div class="form-inline"><p>
-                    <label for="popularity_id">Image 1</label>
-                    <input class="form-control" id="image1_id" name="image1_field" type="text" value="model.image1" disabled="" />
-                    <input class="btn btn-default form-control" type="file" name="datafile" size="40">
-                </div>
-                <div class="form-inline"><p>
-                    <label for="popularity_id">Image 2</label>
-                    <input class="form-control" id="image2_id" name="image2_field" type="text" value="model.image2" disabled="" />
-                    <input class="btn btn-default form-control" type="file" name="datafile" size="40">
-                </div>
-                <div class="form-inline"><p>
-                    <label for="popularity_id">Image 3</label>
-                    <input class="form-control" id="image3_id" name="image3_field" type="text" value="model.image3" disabled="" />
-                    <input class="btn btn-default form-control" type="file" name="datafile" size="40">
-                </div>
-                <div class="form-inline"><p>
-                    <label for="popularity_id">Image 4</label>
-                    <input class="form-control" id="image4_id" name="image4_field" type="text" value="model.image4" disabled="" />
-                    <input class="btn btn-default form-control" type="file" name="datafile" size="40">
-                </div>
-                <div class="form-inline"><p>
-                    <label for="popularity_id">Image 5</label>
-                    <input class="form-control" id="image5_id" name="image5_field" type="text" value="model.image5" disabled="" />
-                    <input class="btn btn-default form-control" type="file" name="datafile" size="40">
-                </div>
+                    <!-- We need a submit button to submit a form! -->
+                    <input type="submit" value="Save" class="btn btn-success"/> <a href="/admin-models/delete/<id>" class="btn btn-danger">Delete</a> <a href="/admin-models" class="btn btn-default">Back</a>
 
+                  </form>
+              {% endif %}
 
-                <!-- We need a submit button to submit a form! -->
-                <input type="submit" value="Save" class="btn btn-success"/> <a href="/admin-models/delete/<id>" class="btn btn-danger">Delete</a> <a href="/admin-models" class="btn btn-default">Back</a>
-
-              </form>
             </div>
 
           </div>

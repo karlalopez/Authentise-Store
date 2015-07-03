@@ -93,7 +93,7 @@ def get_user_by_id(id):
     return User.query.filter_by(id=id).first()
 
 
-def create_user(email, password, admin):
+def create_user(email, password, admin): # Try?
     print User.query.count()
     if User.query.count() == 0:
         admin = True
@@ -123,7 +123,6 @@ def update_user(user, user_email, user_admin):
         db.session.rollback()
 
 
-
 def delete_user(id):
     user = User.query.get(id)
     if user:
@@ -139,6 +138,70 @@ def delete_user(id):
             return "Something went wrong"
     else:
             return "User not found"
+
+# Model related functions
+
+def get_models():
+    models = Model.query.all()
+    return model
+
+
+def get_model_by_id(id):
+    return Model.query.filter_by(id=id).first()
+
+# def create_model(----):
+#     date_added = datetime.date.today()
+#     #####
+#     model = Model(-----)
+#     db.session.add(model)
+#     try:
+#         db.session.commit()
+#         return model
+#     except:
+#         db.session.rollback()
+#         return False
+#
+# def update_model(----):
+#     if user_email is None or user_email == '':
+#         raise Exception("Model needs a valid info")
+#
+#     #####
+#     try:
+#         db.session.commit()
+#         return user
+#     except:
+#         # If something went wrong, explicitly roll back the database
+#         db.session.rollback()
+
+
+def delete_user(id):
+    model = Model.query.get(id)
+    if model:
+        db.session.delete(model)
+
+        try:
+            db.session.commit()
+            return "Model {} deleted".format(id)
+        except:
+            # If something went wrong, explicitly roll back the database
+            db.session.rollback()
+            return "Something went wrong"
+    else:
+            return "Model not found"
+
+# Images related functions
+
+def get_images_by_model_id(id):
+    return Image.query.filter_by(model_id=id).all()
+
+
+# Collection related functions
+
+def get_collections():
+    collections = Collection.query.all()
+    for collection in collections:
+        print collection.name
+    return collections
 
 
 if __name__ == "__main__":

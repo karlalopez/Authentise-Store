@@ -117,7 +117,10 @@ def adminmodels_view(id):
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            return render_template('view-model.html', email=email)
+            model = get_model_by_id(id)
+            images = get_images_by_model_id(id)
+            collections = get_collections()
+            return render_template('view-model.html', email=email, model=model, collections=collections, images=images)
     return redirect('/shop')
 
 @app.route('/admin-models/new')
