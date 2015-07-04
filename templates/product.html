@@ -9,10 +9,15 @@
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="#">Home<span class="sr-only">(current)</span></a></li>
-            <li><a href="#">Collection</a></li>
-            <li><a href="#">Collection</a></li>
-            <li><a href="#">Collection</a></li>
+            <li class="active"><a href="/shop">Home<span class="sr-only">(current)</span></a></li>
+            {% for collection in collections %}
+                {% if collection_name == collection.name %}
+                <li class="active"><a href="/collection/{{collection.id}}">{{collection.name}}</a></li>
+                {% else %}
+                <li><a href="/collection/{{collection.id}}">{{collection.name}}</a></li>
+                {% endif %}
+            {% endfor %}
+
           </ul>
         </div>
         {% if model %}

@@ -71,11 +71,11 @@
                           {% if images %}
                             {% for image in images %}
                                 <div class="col-md-3 col-sm-3">
-                                    <img src= {{image.path}}" class="img-responsive"/>
+                                    <img src="{{image.path}}" class="img-responsive"/>
                                 </div>
                                 {% endfor%}
                               {% endif %}
-                        </div>
+                        </div><p><p>
 
                     <!-- We need a submit button to submit a form! -->
                     <input type="submit" value="Save" class="btn btn-success"/> <a href="/admin-models/deactivate/{{model.id}}" class="btn btn-danger">Deactivate</a> <a href="/admin-models" class="btn btn-default">Back</a>

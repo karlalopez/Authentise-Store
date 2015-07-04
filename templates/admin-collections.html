@@ -31,26 +31,14 @@
                   </tr>
                 </thead>
                 <tbody>
+                  {% for collection in collections %}
+
                   <tr>
-                    <td>1,001</td>
-                    <td>Lorem</td>
+                    <td><a href="/admin-collections/{{collection.id}}">{{collection.name}}</td>
+                    <td>{{collection.description}}</td>
                   </tr>
                   <tr>
-                    <td>1,002</td>
-                    <td>amet</td>
-                  </tr>
-                  <tr>
-                    <td>1,003</td>
-                    <td>Integer</td>
-                  </tr>
-                  <tr>
-                    <td>1,003</td>
-                    <td>libero</td>
-                  </tr>
-                  <tr>
-                    <td>1,004</td>
-                    <td>dapibus</td>
-                  </tr>
+                  {% endfor %}
 
                 </tbody>
               </table>

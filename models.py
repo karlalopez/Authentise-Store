@@ -10,10 +10,13 @@ class Collection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     description = db.Column(db.String(255))
+    active = db.Column(db.Boolean)
 
-    def __init__(self, name, description):
+    def __init__(self, name, description,active=None):
         self.name = name
         self.description = description
+        self.active = True
+
 
 class Model(db.Model):
 
@@ -46,7 +49,7 @@ class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     path = db.Column(db.String(200))
     model_id = db.Column(db.Integer, db.ForeignKey('model.id'))
-    # model = db.relationship("Model", backref="images")
+    #model = db.relationship("Model", backref="images")
 
     def __init__(self, path, model_id):
         self.path = path
@@ -100,7 +103,7 @@ def get_user_by_id(id):
     return User.query.filter_by(id=id).first()
 
 
-def create_user(email, password, admin): # Try?
+def create_user(email, password): # Try?
     print User.query.count()
     if User.query.count() == 0:
         admin = True
@@ -111,6 +114,7 @@ def create_user(email, password, admin): # Try?
         return user
     else:
         date_added = datetime.date.today()
+        admin = False
         user = User(email, date_added, password, admin)
         db.session.add(user)
         db.session.commit()
@@ -151,6 +155,11 @@ def delete_user(id):
 def get_models():
     models = Model.query.filter_by(active='True').all()
     return models
+
+def get_models_by_collection(id):
+    models = Model.query.filter_by(collection_id=id).all()
+    return models
+
 
 def get_model_by_id(id):
     return Model.query.filter_by(id=id).first()
@@ -258,10 +267,59 @@ def save_images(model_to_create, model_image1, model_image2, model_image3, model
 # Collection related functions
 
 def get_collections():
-    collections = Collection.query.all()
+    collections = Collection.query.filter_by(active='True').all()
     for collection in collections:
         print collection.name
     return collections
+
+def get_collection_name_by_id(id):
+    collection = Collection.query.filter_by(id=id).first()
+    return collection.name
+
+def get_collection_by_id(id):
+    collection = Collection.query.filter_by(id=id).first()
+    return collection
+
+def create_collection(collection_name, collection_description):
+    collection = Collection(collection_name, collection_description)
+    print "new Collection"
+    try:
+        db.session.add(collection)
+        print "db.add"
+        db.session.commit()
+        print "db.commit"
+        return collection
+    except Exception as e:
+        db.session.rollback()
+        print e
+        return e
+
+def update_collection(collection, collection_name, collection_description):
+    # if user_email is None or user_email == '':
+    #     raise Exception("Model needs a valid info")
+    print "Collection update"
+    collection.name = collection_name
+    collection.description = collection_description
+    try:
+        db.session.commit()
+        return collection
+    except:
+        # If something went wrong, explicitly roll back the database
+        db.session.rollback()
+
+
+def deactivate_collection(id):
+    collection = Collection.query.get(id)
+    if collection:
+        print "Collection deactivation"
+        collection.active = False
+        try:
+            db.session.commit()
+            return collection
+        except:
+            # If something went wrong, explicitly roll back the database
+            db.session.rollback()
+
 
 
 if __name__ == "__main__":

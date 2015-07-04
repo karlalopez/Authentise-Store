@@ -75,11 +75,12 @@ def shop():
     if session.get('email'):
         print "Logged-in: Found session"
         email = session['email']
-        collections = def get_collections()
-        models = def get_models()
-
-        return render_template('shop.html', email=email)
+        collections = get_collections()
+        models = get_models()
+        return render_template('shop.html', email=email, models=models, collections=collections)
     else:
+        collections = get_collections()
+        models = get_models()
         return render_template('shop.html')
 
 @app.route('/product/<id>')
@@ -89,11 +90,28 @@ def product(id):
         email = session['email']
         model = get_model_by_id(id)
         images = get_images_by_model_id(id)
-        return render_template('product.html', email=email, model=model, images=images)
+        collections = get_collections()
+        return render_template('product.html', email=email, model=model, images=images, collections=collections)
     else:
         model = get_model_by_id(id)
         images = get_images_by_model_id(id)
-        return render_template('product.html', model=model, images=images)
+        collections = get_collections()
+        return render_template('product.html', email=email, model=model, images=images, collections=collections)
+
+@app.route('/collection/<id>')
+def collection(id):
+    if session.get('email'):
+        print "Logged-in: Found session"
+        email = session['email']
+        collections = get_collections()
+        models = get_models_by_collection(id)
+        collection_name = get_collection_name_by_id(id)
+        return render_template('shop.html', email=email, models=models, collections=collections, collection_name=collection_name)
+    else:
+        collections = get_collections()
+        models = get_models_by_collection(id)
+        collection_id = id
+        return render_template('shop.html', models=models, collections=collections, collection_id=collection_id)
 
 
 @app.route('/admin')
@@ -201,8 +219,8 @@ def admincollections():
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            # delete function
-            return render_template('admin-collections.html', email=email)
+            collections = get_collections()
+            return render_template('admin-collections.html', email=email, collections=collections)
     return redirect('/shop')
 
 @app.route('/admin-collections/<id>', methods=['GET', 'POST'])
@@ -212,39 +230,58 @@ def admincollections_view(id):
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            # delete function
-            return render_template('view-collection.html', email=email)
+            collection = get_collection_by_id(id)
+            if request.method == 'GET':
+                print "get"
+                return render_template('view-collection.html', email=email, collection=collection)
+            print "post"
+            collection_name = request.form.get('collection_name_field')
+            collection_description = request.form.get('collection_description_field')
+            try:
+                collection_to_update = update_collection(collection, collection_name, collection_description)
+                print collection_to_update
+                return redirect('admin-collections')
+            except Exception as e:
+                return render_template('view-collection.html', error=e.message, email=email, collection=collection)
+
     return redirect('/shop')
 
-@app.route('/admin-collections/new')
+@app.route('/admin-collections/new', methods=['GET', 'POST'])
 def admincollections_new():
     if session.get('email'):
         print "Logged-in: Found session"
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            return render_template('new-collection.html', email=email)
-    return redirect('/shop')
+            if request.method == 'GET':
+                print "get"
+                return render_template('new-collection.html', email=email)
 
-@app.route('/admin-collections/add')
-def admincollections_add():
+            print "post"
+            collection_name = request.form.get('collection_name_field')
+            print collection_name
+            collection_description = request.form.get('collection_description_field')
+            print collection_description
+            try:
+                print "try"
+                collection_to_create = create_collection(collection_name, collection_description)
+            except Exception as e:
+                return render_template('new-collection.html', error=e.message, email=email)
+    return redirect('/admin-collections')
+
+
+@app.route('/admin-collections/deactivate/<id>', methods=['GET', 'POST'])
+def admincollections_deactivate(id):
     if session.get('email'):
         print "Logged-in: Found session"
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            # add function
-            return render_template('admin-collections.html', email=email)
-    return redirect('/shop')
-
-@app.route('/admin-collections/delete/<id>', methods=['GET', 'POST'])
-def admincollections_delete(id):
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
-        if user.admin == True:
-            # delete function
+            collection_to_deactivate = get_collection_by_id(id)
+            if collection_to_deactivate:
+                print collection_to_deactivate.id
+                deactivate_collection(collection_to_deactivate.id)
+                return redirect('admin-collections')
             return render_template('admin-collections.html', email=email)
     return redirect('/shop')
 
@@ -330,10 +367,8 @@ def adminusers_new():
                 return render_template('new-user.html', email=email)
             user_email = request.form.get('user_email_field')
             user_password = request.form.get('user_password_field')
-            user_admin = request.form.get('user_admin_field')
-
             try:
-                user = create_user(user_email, user_password, user_admin)
+                user = create_user(user_email, user_password)
                 print user
                 return redirect('admin-users')
             except Exception as e:

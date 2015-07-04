@@ -9,7 +9,7 @@ AUTHENTISE_KEY = "AUTHENTISE_API_KEY"
 
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join('static/models')
+UPLOAD_FOLDER = os.path.join('static/uploads')
 
 ALLOWED_EXTENSIONS = set(['stl'])
 

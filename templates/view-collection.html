@@ -21,31 +21,53 @@
           </div>
           <div class="row">
             <div class="col-md-12">
-              <form action="/edit/collection_id" method="POST">
+              {% if collection %}
 
-                <div class="form-group">
+                    <form action="/admin-collections/{{collection.id}}" method="POST">
 
-                    <label for="collection_name_id">Name</label>
-                    <input  class="form-control form-inline" id="collection_name_id" name="collection_name_field" type="text" value="collection.name" />
+                      <div class="form-group">
 
+                          <label for="collection_name_id">Name</label>
+                          <input  class="form-control form-inline" id="collection_name_id" name="collection_name_field" type="text" value="{{collection.name}}" />
+
+                      </div>
+
+                      <div class="form-group">
+
+                          <label for="collection_description_id">Description</label>
+                          <input class="form-control" id="collection_description_id" name="collection_description_field" type="text" size="4" value="{{collection.description}}" />
+                      </div>
+
+
+                    <!-- We need a submit button to submit a form! -->
+                    <input type="submit" value="Save" class="btn btn-success"/> <a href="/admin-collections/deactivate/{{collection.id}}" class="btn btn-danger">Deactivate</a> <a href="/admin-collections" class="btn btn-default">Back</a>
+
+                    </form>
+                  {% else %}
+                    <div class="alert alert-danger" role="alert">
+
+                    Collection does not exist. <a href="/admin-users">Back</a>
+
+                    {{ error }}
+
+                    </div>
+
+                  {% endif %}
                 </div>
 
-                <div class="form-group">
+                  {% if error %}
+                      <div class="alert alert-danger" role="alert">
 
-                    <label for="collection_description_id">Description</label>
-                    <input class="form-control" id="collection_description_id" name="collection_description_field" type="text" size="4" value="collection.description" />
-                </div>
+                      An error occurred trying to edit collection:
 
+                      {{ error }}
 
-              <!-- We need a submit button to submit a form! -->
-              <input type="submit" value="Save" class="btn btn-success"/> <a href="/admin-collection/delete/<id>" class="btn btn-danger">Delete</a> <a href="/admin-collections" class="btn btn-default">Back</a>
+                      </div>
+                  {% endif %}
 
-              </form>
+              </div>
             </div>
-
           </div>
         </div>
-      </div>
-    </div>
-  </body>
-</html>
+      </body>
+    </html>
