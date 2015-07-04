@@ -21,63 +21,76 @@
           </div>
           <div class="row">
             <div class="col-md-12">
-              <form action="/admin-models/add" method="POST">
+              <form action="/admin-models/new" method="POST" enctype="multipart/form-data">
 
                 <div class="form-group">
 
                     <label for="model_name_id">Name</label>
-                    <input  class="form-control form-inline" id="model_name_id" name="model_name_field" type="text" placeholder="Name" />
+                    <input  class="form-control form-inline" id="model_name_id" name="model_name_field" type="text" placeholder="Name" required />
 
                 </div>
 
                 <div class="form-group">
 
                     <label for="description_id">Description</label>
-                    <input class="form-control" id="model_description_id" name="model_description_field" type="text" size="4" placeholder="Description" />
+                    <input class="form-control" id="model_description_id" name="model_description_field" type="text" size="4" placeholder="Description" required />
                 </div>
 
                 <div class="form-group">
 
                     <label for="dimensions_id">Dimensions</label>
-                    <input class="form-control" id="model_dimensions_id" name="model_dimensions_field" type="text" placeholder="Dimensions" />
+                    <input class="form-control" id="model_dimensions_id" name="model_dimensions_field" type="text" placeholder="Dimensions" required />
                 </div>
                 <div class="form-group">
 
                   <label for="collection_id">Collection</label>
-                  <select class="form-control" id="model_collection_id" name="model_collection_field" type="text">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
+
+                  <select class="form-control" id="collection_id" name="model_collection_field" type="text">
+                    {% for collection in collections %}
+                        <option value={{collection.id}}>{{ collection.name }}</option>
+                    {% endfor %}
                   </select>
                 </div>
 
                 <div class="form-group">
 
-                    <label for="price_id">Price</label>
-                    <input class="form-control" id="model_price_id" name="model_price_field" type="text" placeholder="00.00" maxlength="6" />
+                    <label for="model_price_id">Price</label>
+                    <input class="form-control" id="model_price_id" name="model_price_field" type="text" placeholder="00.00" maxlength="6" required/>
                 </div>
-
+                <div class="form-group">
+                  <label for="model_path">Model file</label>
+                  <input class="btn btn-default" type="file" id="model_path_id" name="model_path_field" size="40" required></p>
+                </div>
                 <div class="form-group">
 
                     <label for="image1_id">Images</label>
 
-                    <p><input class="btn btn-default" type="file" id="model_image1_id" name="model_datafile1_field" size="40"></p>
+                    <p><input class="btn btn-default" type="file" id="model_image1_id" name="model_image1_field" size="40" required></p>
 
-                    <p><input class="btn btn-default" type="file" id="model_image2_id" name="model_datafile2_field" size="40"></p>
+                    <p><input class="btn btn-default" type="file" id="model_image2_id" name="model_image2_field" size="40" required></p>
 
-                    <p><input class="btn btn-default" type="file" id="model_image3_id" name="model_datafile3_field" size="40"></p>
+                    <p><input class="btn btn-default" type="file" id="model_image3_id" name="model_image3_field" size="40" required></p>
 
-                    <p><input class="btn btn-default" type="file" id="model_image4_id" name="model_datafile4_field" size="40"></p>
+                    <p><input class="btn btn-default" type="file" id="model_image4_id" name="model_image4_field" size="40" required></p>
 
-                    <p><input class="btn btn-default" type="file" id="model_image5_id" name="model_datafile5_field" size="40">
+                    <p><input class="btn btn-default" type="file" id="model_image5_id" name="model_image5_field" size="40" required>
 
               <!-- We need a submit button to submit a form! -->
               <p><input type="submit" placeholder="Save" class="btn btn-success"/> <a href="/admin-models" class="btn btn-default">Back</a>
 
 
               </form>
+
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+
+                An error occurred trying to edit model:
+
+                {{ error }}
+
+                </div>
+            {% endif %}
+
 
 
 

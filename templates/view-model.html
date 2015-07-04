@@ -22,34 +22,34 @@
           <div class="row">
             <div class="col-md-12">
               {% if model %}
-                  <form action="/edit/model_id" method="POST">
+                  <form action="/admin-models/{{model.id}}" method="POST">
 
                     <div class="form-group">
 
                         <label for="name_id">Name</label>
-                        <input  class="form-control form-inline" id="name_id" name="name_field" type="text" value="{{model.name}}" />
+                        <input  class="form-control form-inline" id="name_id" name="model_name_field" type="text" value="{{model.name}}" />
 
                     </div>
 
                     <div class="form-group">
 
                         <label for="description_id">Description</label>
-                        <input class="form-control" id="description_id" name="description_field" type="text" size="4" value="{{model.description}}" />
+                        <input class="form-control" id="description_id" name="model_description_field" type="text" size="4" value="{{model.description}}" />
                     </div>
 
                     <div class="form-group">
 
                         <label for="dimensions_id">Dimensions</label>
-                        <input class="form-control" id="dimensions_id" name="dimensions_field" type="text" value="{{model.dimensions}}" />
+                        <input class="form-control" id="dimensions_id" name="model_dimensions_field" type="text" value="{{model.dimensions}}" />
                     </div>
                     <div class="form-group">
                       <label for="collection_id">Collection</label>
-                      <select class="form-control" id="collection_id" name="collection_field" type="text">
+                      <select class="form-control" id="collection_id" name="model_collection_field" type="text">
                         {% for collection in collections %}
                           {% if collection.id == model.collection_id %}
-                            <option selected>{{ collection.name }}</option>
+                            <option selected value={{collection.id}}>{{ collection.name }}</option>
                           {% else %}
-                            <option>{{ collection.name }}</option>
+                            <option value={{collection.id}}>{{ collection.name }}</option>
                           {% endif %}
                         {% endfor %}
                       </select>
@@ -57,7 +57,7 @@
 
                     <div class="form-group">
                         <label for="price_id">Price</label>
-                        <input class="form-control" id="price_id" name="price_field" type="text" size="4" value="{{model.price}}" maxlength="6" size="6" />
+                        <input class="form-control" id="price_id" name="model_price_field" type="text" size="4" value="{{model.price}}" maxlength="6" size="6" />
                     </div>
                     <div class="form-group">
 
@@ -65,21 +65,44 @@
                         <input class="form-control" id="popularity_id" name="popularity_field" type="text" value="{{model.popularity}}" disabled="" />
 
                     </div>
-                    {% if images %}
-                      {% for image in images %}
-                        <div class="form-inline"><p>
-                            <label for="popularity_id">Image {{loop.index}}</label>
-                            <input class="form-control" id="image{{loop.index}}_id" name="image1_field" type="text" value="{{image.path}}" disabled="" />
-                            <input class="btn btn-default form-control" type="file" name="datafile" size="40">
+                    <div class="form-group">
+                      <label>Images</label><p>
+                        <div class="row">
+                          {% if images %}
+                            {% for image in images %}
+                                <div class="col-md-3 col-sm-3">
+                                    <img src= {{image.path}}" class="img-responsive"/>
+                                </div>
+                                {% endfor%}
+                              {% endif %}
                         </div>
-                      {% endfor%}
-                    {% endif %}
 
                     <!-- We need a submit button to submit a form! -->
-                    <input type="submit" value="Save" class="btn btn-success"/> <a href="/admin-models/delete/<id>" class="btn btn-danger">Delete</a> <a href="/admin-models" class="btn btn-default">Back</a>
+                    <input type="submit" value="Save" class="btn btn-success"/> <a href="/admin-models/deactivate/{{model.id}}" class="btn btn-danger">Deactivate</a> <a href="/admin-models" class="btn btn-default">Back</a>
 
                   </form>
+              {% else %}
+                <div class="alert alert-danger" role="alert">
+
+                Model does not exist. <a href="/admin-users">Back</a>
+
+                {{ error }}
+
+                </div>
+
               {% endif %}
+            </div>
+
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+
+                An error occurred trying to edit model:
+
+                {{ error }}
+
+                </div>
+            {% endif %}
+
 
             </div>
 

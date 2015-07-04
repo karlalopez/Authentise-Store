@@ -3,7 +3,6 @@
 <link href="/static/carousel.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
-\
 {% include 'navbar.html' %}
 
     <div class="container-fluid">
@@ -16,17 +15,19 @@
             <li><a href="#">Collection</a></li>
           </ul>
         </div>
+        {% if model %}
+
         <div class="col-md-9 col-md-offset-2 main">
           <div class="row">
             <div class="col-md-6 col-sm-3">
-              <img src="http://cdn.instructables.com/F2M/OJ91/HIGILLKH/F2MOJ91HIGILLKH.LARGE.jpg" class="img-responsive" alt="Generic placeholder thumbnail">
+              <img src="{{images[0].path}}" class="img-responsive" alt="{{model.name}}">
             </div>
             <div class="col-md-4 col-sm-3">
-              <h4>Model Name</h4>
-              <span class="text-muted">$XX.XX</span>
-              <p>
-                Description of the model.
-              </p>
+              <h4>{{model.name}}</h4>
+              <span class="text-muted">${{model.price}}</span>
+              <div><p><p>
+              {{model.description}}
+              </div>
             </div>
             <div class="col-md-2 col-sm-3">
               <p>
@@ -46,20 +47,30 @@
           <p>
           <div class="row">
             <div class="col-md-3 col-sm-3">
-              <img src="http://cdn.instructables.com/F2M/OJ91/HIGILLKH/F2MOJ91HIGILLKH.LARGE.jpg" class="img-responsive" alt="Generic placeholder thumbnail">
+              <img src="{{images[1].path}}" class="img-responsive" alt="{{model.name}}">
             </div>
             <div class="col-md-3 col-sm-3">
-              <img src="http://cdn.instructables.com/F2M/OJ91/HIGILLKH/F2MOJ91HIGILLKH.LARGE.jpg" class="img-responsive" alt="Generic placeholder thumbnail">
+              <img src="{{images[2].path}}" class="img-responsive" alt="{{model.name}}">
             </div>
             <div class="col-md-3 col-sm-3">
-              <img src="http://cdn.instructables.com/F2M/OJ91/HIGILLKH/F2MOJ91HIGILLKH.LARGE.jpg" class="img-responsive" alt="Generic placeholder thumbnail">
+              <img src="{{images[3].path}}" class="img-responsive" alt="{{model.name}}">
             </div>
             <div class="col-md-3 col-sm-3">
-              <img src="http://cdn.instructables.com/F2M/OJ91/HIGILLKH/F2MOJ91HIGILLKH.LARGE.jpg" class="img-responsive" alt="Generic placeholder thumbnail">
+              <img src="{{images[4].path}}" class="img-responsive" alt="{{model.name}}">
             </div>
 
           </div>
         </div>
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+
+            Model does not exist. <a href="/shop">Back</a>
+
+            {{ error }}
+
+            </div>
+        {% endif %}
+
       </div>
     </div>
   </body>

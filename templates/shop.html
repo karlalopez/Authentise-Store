@@ -18,26 +18,19 @@
             Order by: Price | Popularity
           </div>
           <div class="row placeholders">
+
+            {% for model in models %}
+                {% if loop.index % 4 == 0 %}
+                </div>
+                <div class="row placeholders">
+                {% endif %}
+
             <div class="col-xs-6 col-sm-3 placeholder">
-              <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Model Name</h4>
-              <span class="text-muted">$XX.XX</span>
+              <img data-src="{{images[1].path}}" class="img-responsive" alt="{{model.name}}">
+              <h4>{{model.name}}</h4>
+              <span class="text-muted">${{model.price}}</span>
             </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <img data-src="holder.js/200x200/auto/vine" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Model Name</h4>
-              <span class="text-muted">$XX.XX</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Model Name</h4>
-              <span class="text-muted">$XX.XX</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder">
-              <img data-src="holder.js/200x200/auto/sky" class="img-responsive" alt="Generic placeholder thumbnail">
-              <h4>Model Name</h4>
-              <span class="text-muted">$XX.XX</span>
-            </div>
+
           </div>
         </div>
       </div>

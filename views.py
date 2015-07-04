@@ -1,6 +1,7 @@
-from flask import render_template, request, redirect, session, jsonify
+from flask import render_template, request, redirect, session, jsonify, url_for
 from models import *
 from app import app
+from werkzeug import secure_filename
 
 @app.route('/')
 def index():
@@ -74,17 +75,25 @@ def shop():
     if session.get('email'):
         print "Logged-in: Found session"
         email = session['email']
+        collections = def get_collections()
+        models = def get_models()
+
         return render_template('shop.html', email=email)
     else:
         return render_template('shop.html')
-@app.route('/product')
-def product():
+
+@app.route('/product/<id>')
+def product(id):
     if session.get('email'):
         print "Logged-in: Found session"
         email = session['email']
-        return render_template('product.html', email=email)
+        model = get_model_by_id(id)
+        images = get_images_by_model_id(id)
+        return render_template('product.html', email=email, model=model, images=images)
     else:
-        return render_template('product.html')
+        model = get_model_by_id(id)
+        images = get_images_by_model_id(id)
+        return render_template('product.html', model=model, images=images)
 
 
 @app.route('/admin')
@@ -106,8 +115,9 @@ def adminmodels():
         print "Logged-in: Found session"
         email = session['email']
         user = get_user_by_email(email)
+        models = get_models()
         if user.admin == True:
-            return render_template('admin-models.html', email=email)
+            return render_template('admin-models.html', models=models,email=email)
     return redirect('/shop')
 
 @app.route('/admin-models/<id>', methods=['GET', 'POST'])
@@ -120,39 +130,66 @@ def adminmodels_view(id):
             model = get_model_by_id(id)
             images = get_images_by_model_id(id)
             collections = get_collections()
-            return render_template('view-model.html', email=email, model=model, collections=collections, images=images)
+            if request.method == 'GET':
+                print "get"
+                return render_template('view-model.html', email=email, model=model, collections=collections, images=images)
+            print "post"
+            model_name = request.form.get('model_name_field')
+            model_description = request.form.get('model_description_field')
+            model_collection = request.form.get('model_collection_field')
+            model_dimensions = request.form.get('model_dimensions_field')
+            model_price = request.form.get('model_price_field')
+            try:
+                model_to_update = update_model(model, model_name, model_description, model_dimensions, model_collection, model_price)
+                print model_to_update
+                return redirect('admin-models')
+            except Exception as e:
+                return render_template('view-model.html', error=e.message, email=email, model=model, collections=collections, images=images)
+
     return redirect('/shop')
 
-@app.route('/admin-models/new')
+@app.route('/admin-models/new', methods=['GET', 'POST'])
 def adminmodels_new():
     if session.get('email'):
         print "Logged-in: Found session"
         email = session['email']
         user = get_user_by_email(email)
+        collections = get_collections()
         if user.admin == True:
-            return render_template('new-model.html', email=email)
-    return redirect('/shop')
+            if request.method == 'GET':
+                print "get"
+                return render_template('new-model.html', email=email, collections=collections)
 
-@app.route('/admin-models/add')
-def adminmodels_add():
+            print "post"
+            model_name = request.form.get('model_name_field')
+            model_description = request.form.get('model_description_field')
+            model_collection = request.form.get('model_collection_field')
+            model_dimensions = request.form.get('model_dimensions_field')
+            model_price = request.form.get('model_price_field')
+
+            file = request.files['model_path_field']
+            model_path = save_model(file)
+            print "model path: {}".format(model_path)
+
+            try:
+                model_to_create = create_model(model_name, model_path, model_description, model_dimensions, model_collection, model_price)
+                images = save_images(model_to_create, request.files['model_image1_field'],request.files['model_image2_field'], request.files['model_image3_field'], request.files['model_image4_field'], request.files['model_image5_field'])
+            except Exception as e:
+                return render_template('new-model.html', error=e.message, email=email, collections=collections)
+
+    return redirect('/admin-models')
+
+@app.route('/admin-models/deactivate/<id>', methods=['GET', 'POST'])
+def adminmodels_deactivate(id):
     if session.get('email'):
         print "Logged-in: Found session"
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            # add function
-            return render_template('admin-models.html', email=email)
-    return redirect('/shop')
-
-@app.route('/admin-models/delete/<id>', methods=['GET', 'POST'])
-def adminmodels_delete(id):
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
-        if user.admin == True:
-            # delete function
-            return render_template('admin-models.html', email=email)
+            model_to_deactivate = get_model_by_id(id)
+            if model_to_deactivate:
+                deactivate_model(model_to_deactivate.id)
+                return redirect('admin-models')
     return redirect('/shop')
 
 # Collections route
