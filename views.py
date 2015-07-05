@@ -14,7 +14,7 @@ def login():
         email = session['email']
         return redirect('/shop')
     else:
-        return render_template('/login.html')
+        return render_template('/login.html', shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/submit-login', methods=['POST'])
 def submit_login():
@@ -28,9 +28,9 @@ def submit_login():
             session['email'] = user_email
             return redirect('/shop')
         else:
-            return render_template('login.html', error="Login credentials don't not work")
+            return render_template('login.html', error="Login credentials don't not work", shop_name=shop_name, shop_tagline=shop_tagline)
     else:
-        return render_template('login.html', error="Login credentials don't not work")
+        return render_template('login.html', error="Login credentials don't not work", shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/logout')
 def logout():
@@ -46,7 +46,7 @@ def signup():
         email = session['email']
         return redirect('/shop')
     else:
-        return render_template('signup.html')
+        return render_template('signup.html', shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/submit-signup', methods=['POST'])
 def submit_signup():
@@ -57,7 +57,7 @@ def submit_signup():
 
     # check for duplicated username
     if get_user_by_email(user_email):
-        return render_template('signup.html',error="Email already taken")
+        return render_template('signup.html', shop_name=shop_name, shop_tagline=shop_tagline, error="Email already taken")
     # if no duplicates, create user
     else:
         try:
@@ -68,7 +68,7 @@ def submit_signup():
         except Exception as e:
             # Oh no, something went wrong!
             # We can access the error message via e.message:
-            return render_template('signup.html', error=e.message)
+            return render_template('signup.html', shop_name=shop_name, shop_tagline=shop_tagline, error=e.message)
 
 @app.route('/shop')
 def shop():
@@ -77,11 +77,11 @@ def shop():
         email = session['email']
         collections = get_collections()
         models = get_models()
-        return render_template('shop.html', email=email, models=models, collections=collections)
+        return render_template('shop.html', email=email, models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
     else:
         collections = get_collections()
         models = get_models()
-        return render_template('shop.html')
+        return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/product/<id>')
 def product(id):
@@ -96,12 +96,17 @@ def product(id):
             error = "Model does not exist."
             images = " "
         collections = get_collections()
-        return render_template('product.html', error=error, email=email, model=model, images=images, collections=collections, key=stripe_keys['publishable_key'])
+        return render_template('product.html', error=error, email=email, model=model, images=images, collections=collections, key=stripe_keys['publishable_key'], shop_name=shop_name, shop_tagline=shop_tagline)
     else:
         model = get_model_by_id(id)
         images = get_images_by_model_id(id)
         collections = get_collections()
-        return render_template('product.html', model=model, images=images, collections=collections, key=stripe_keys['publishable_key'])
+        return render_template('product.html', model=model, images=images, collections=collections, key=stripe_keys['publishable_key'],shop_name=shop_name, shop_tagline=shop_tagline)
+
+@app.route('/models')
+def models():
+    return redirect('/shop')
+
 
 @app.route('/checkout/<id>', methods=['POST'])
 def checkout(id):
@@ -129,30 +134,13 @@ def checkout(id):
         if charge.status == 'succeeded':
             stripe_charge_id = charge.id
             token = update_token(new_token, stripe_charge_id)
-            return render_template('checkout.html', amount=amount, token=token, email=email, model=model, collections=collections)
+            return render_template('checkout.html', amount=amount, token=token, email=email, model=model, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
         else:
             error = "We are very sorry, but there was a problem with your purchase. Please try again."
-            return render_template('product.html', email=email, model=model, collections=collections, error=error)
+            return render_template('product.html', email=email, model=model, collections=collections, error=error, shop_name=shop_name, shop_tagline=shop_tagline)
 
     else:
         return render_template('login.html')
-
-
-@app.route('/collection/<id>')
-def collection(id):
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        collections = get_collections()
-        models = get_models_by_collection(id)
-        collection_name = get_collection_name_by_id(id)
-        return render_template('shop.html', email=email, models=models, collections=collections, collection_name=collection_name)
-    else:
-        collections = get_collections()
-        models = get_models_by_collection(id)
-        collection_id = id
-        return render_template('shop.html', models=models, collections=collections, collection_id=collection_id)
-
 
 @app.route('/admin')
 def admin():
@@ -161,7 +149,7 @@ def admin():
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            return render_template('admin.html', email=email)
+            return render_template('admin.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 
@@ -175,7 +163,7 @@ def adminmodels():
         user = get_user_by_email(email)
         models = get_models()
         if user.admin == True:
-            return render_template('admin-models.html', models=models,email=email)
+            return render_template('admin-models.html', models=models,email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 @app.route('/admin-models/<id>', methods=['GET', 'POST'])
@@ -190,7 +178,7 @@ def adminmodels_view(id):
             collections = get_collections()
             if request.method == 'GET':
                 print "get"
-                return render_template('view-model.html', email=email, model=model, collections=collections, images=images)
+                return render_template('view-model.html', email=email, model=model, collections=collections, images=images, shop_name=shop_name, shop_tagline=shop_tagline)
             print "post"
             model_name = request.form.get('model_name_field')
             model_description = request.form.get('model_description_field')
@@ -202,7 +190,7 @@ def adminmodels_view(id):
                 print model_to_update
                 return redirect('admin-models')
             except Exception as e:
-                return render_template('view-model.html', error=e.message, email=email, model=model, collections=collections, images=images)
+                return render_template('view-model.html', error=e.message, email=email, model=model, collections=collections, images=images, shop_name=shop_name, shop_tagline=shop_tagline)
 
     return redirect('/shop')
 
@@ -216,7 +204,7 @@ def adminmodels_new():
         if user.admin == True:
             if request.method == 'GET':
                 print "get"
-                return render_template('new-model.html', email=email, collections=collections)
+                return render_template('new-model.html', email=email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
             print "post"
             model_name = request.form.get('model_name_field')
@@ -233,7 +221,7 @@ def adminmodels_new():
                 model_to_create = create_model(model_name, model_path, model_description, model_dimensions, model_collection, model_price)
                 images = save_images(model_to_create, request.files['model_image1_field'],request.files['model_image2_field'], request.files['model_image3_field'], request.files['model_image4_field'], request.files['model_image5_field'])
             except Exception as e:
-                return render_template('new-model.html', error=e.message, email=email, collections=collections)
+                return render_template('new-model.html', error=e.message, email=email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
     return redirect('/admin-models')
 
@@ -260,7 +248,7 @@ def admincollections():
         user = get_user_by_email(email)
         if user.admin == True:
             collections = get_collections()
-            return render_template('admin-collections.html', email=email, collections=collections)
+            return render_template('admin-collections.html', email=email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 @app.route('/admin-collections/<id>', methods=['GET', 'POST'])
@@ -273,7 +261,7 @@ def admincollections_view(id):
             collection = get_collection_by_id(id)
             if request.method == 'GET':
                 print "get"
-                return render_template('view-collection.html', email=email, collection=collection)
+                return render_template('view-collection.html', email=email, collection=collection, shop_name=shop_name, shop_tagline=shop_tagline)
             print "post"
             collection_name = request.form.get('collection_name_field')
             collection_description = request.form.get('collection_description_field')
@@ -282,7 +270,7 @@ def admincollections_view(id):
                 print collection_to_update
                 return redirect('admin-collections')
             except Exception as e:
-                return render_template('view-collection.html', error=e.message, email=email, collection=collection)
+                return render_template('view-collection.html', error=e.message, email=email, collection=collection, shop_name=shop_name, shop_tagline=shop_tagline)
 
     return redirect('/shop')
 
@@ -295,7 +283,7 @@ def admincollections_new():
         if user.admin == True:
             if request.method == 'GET':
                 print "get"
-                return render_template('new-collection.html', email=email)
+                return render_template('new-collection.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
 
             print "post"
             collection_name = request.form.get('collection_name_field')
@@ -306,7 +294,7 @@ def admincollections_new():
                 print "try"
                 collection_to_create = create_collection(collection_name, collection_description)
             except Exception as e:
-                return render_template('new-collection.html', error=e.message, email=email)
+                return render_template('new-collection.html', error=e.message, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/admin-collections')
 
 
@@ -322,7 +310,7 @@ def admincollections_deactivate(id):
                 print collection_to_deactivate.id
                 deactivate_collection(collection_to_deactivate.id)
                 return redirect('admin-collections')
-            return render_template('admin-collections.html', email=email)
+            return render_template('admin-collections.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 # Orders route
@@ -335,7 +323,7 @@ def adminorders():
         user = get_user_by_email(email)
         if user.admin == True:
             # delete function
-            return render_template('admin-orders.html', email=email)
+            return render_template('admin-orders.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 @app.route('/admin-order/<id>', methods=['GET', 'POST'])
@@ -345,7 +333,7 @@ def adminorder_view(id):
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            return render_template('view-orders.html', email=email)
+            return render_template('view-orders.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 @app.route('/admin-order/delete/<id>', methods=['GET', 'POST'])
@@ -356,7 +344,7 @@ def adminorders_delete(id):
         user = get_user_by_email(email)
         if user.admin == True:
             # delete function
-            return render_template('admin-orders', email=email)
+            return render_template('admin-orders', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 # Users route
@@ -369,7 +357,7 @@ def adminusers():
         user = get_user_by_email(email)
         if user.admin == True:
             users = get_users()
-            return render_template('admin-users.html', email=email, users=users)
+            return render_template('admin-users.html', email=email, users=users, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 @app.route('/admin-users/<id>', methods=['GET', 'POST'])
@@ -382,7 +370,7 @@ def adminusers_view(id):
             if request.method == 'GET':
                 print "get"
                 user_to_view = get_user_by_id(id)
-                return render_template('view-user.html', email=email, user=user_to_view)
+                return render_template('view-user.html', email=email, user=user_to_view, shop_name=shop_name, shop_tagline=shop_tagline)
             print "post"
             user_email = request.form.get('user_email_field')
             user_admin = request.form.get('user_admin_field')
@@ -392,7 +380,7 @@ def adminusers_view(id):
                 user_to_update = update_user(user_to_update, user_email, user_admin)
                 return redirect('admin-users')
             except Exception as e:
-                return render_template('view-user.html', error=e.message, user=user, email=email)
+                return render_template('view-user.html', error=e.message, user=user, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
 
     return redirect('/shop')
 
@@ -404,7 +392,7 @@ def adminusers_new():
         user = get_user_by_email(email)
         if user.admin == True:
             if request.method == 'GET':
-                return render_template('new-user.html', email=email)
+                return render_template('new-user.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
             user_email = request.form.get('user_email_field')
             user_password = request.form.get('user_password_field')
             try:
@@ -412,7 +400,7 @@ def adminusers_new():
                 print user
                 return redirect('admin-users')
             except Exception as e:
-                return render_template('new-user.html', error=e.message, email=email)
+                return render_template('new-user.html', error=e.message, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 @app.route('/admin-users/delete/<id>', methods=['GET', 'POST'])
@@ -435,5 +423,5 @@ def profile():
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            return render_template('profile.html', email=email)
+            return render_template('profile.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/login')

@@ -9,6 +9,8 @@ AUTHENTISE_KEY = "AUTHENTISE_API_KEY"
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join('static/uploads')
+MODELS_FOLDER = os.path.join('models')
+
 
 ALLOWED_EXTENSIONS = set(['stl'])
 
@@ -26,6 +28,7 @@ shop_tagline = "Best shop tagline ever"
 app = Flask(__name__)
 app.secret_key = 'thisisasecret' #You need to set up an app secret key.
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MODELS_FOLDER'] = MODELS_FOLDER
 
 
 # Set up the SQLAlchemy Database to be a local file 'store.db'
@@ -35,4 +38,5 @@ db = SQLAlchemy(app)
 
 if __name__ == "__main__":
     from views import *
+    del session
     app.run(debug=True)

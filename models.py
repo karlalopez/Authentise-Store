@@ -161,7 +161,7 @@ def get_models():
     return models
 
 def get_models_by_collection(id):
-    models = Model.query.filter_by(collection_id=id).all()
+    models = Model.query.filter_by(collection_id=id,active='True').all()
     return models
 
 
@@ -175,9 +175,9 @@ def allowed_file(filename):
 def save_model(file):
     filename = "{}{}".format(todayiso,secure_filename(file.filename))
     print filename
-    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    file.save(os.path.join(app.config['MODELS_FOLDER'], filename))
 
-    model_path = "/{}/{}".format(app.config['UPLOAD_FOLDER'], filename)
+    model_path = "/{}/{}".format(app.config['MODELS_FOLDER'], filename)
     return model_path
 
 def create_model(model_name, model_path, model_description, model_dimensions, model_collection, model_price):
