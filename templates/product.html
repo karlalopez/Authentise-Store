@@ -20,61 +20,70 @@
 
           </ul>
         </div>
-        {% if model %}
 
         <div class="col-md-9 col-md-offset-2 main">
           <div class="row">
-            <div class="col-md-6 col-sm-3">
-              <img src="{{images[0].path}}" class="img-responsive" alt="{{model.name}}">
-            </div>
-            <div class="col-md-4 col-sm-3">
-              <h4>{{model.name}}</h4>
-              <span class="text-muted">${{model.price}}</span>
-              <div><p><p>
-              {{model.description}}
-              </div>
-            </div>
-            <div class="col-md-2 col-sm-3">
-              <p>
-                <button type="button" class="btn btn-primary">Buy this model</button>
-              </p>
-              <small>
-              <p><b>Read before you buy</b></p>
-              <p>  What printers are compatible?</p>
-              <p>  List of compatible printers</p>
-              <p>  What am I buying?</p>
-              <p>  The right to print a model once...</p>
-              <p>  Do I get a file?</p>
-              <p>  No, you get a stream that can...</p>
-              </small>
-            </div>
-          </div>
-          <p>
-          <div class="row">
-            <div class="col-md-3 col-sm-3">
-              <img src="{{images[1].path}}" class="img-responsive" alt="{{model.name}}">
-            </div>
-            <div class="col-md-3 col-sm-3">
-              <img src="{{images[2].path}}" class="img-responsive" alt="{{model.name}}">
-            </div>
-            <div class="col-md-3 col-sm-3">
-              <img src="{{images[3].path}}" class="img-responsive" alt="{{model.name}}">
-            </div>
-            <div class="col-md-3 col-sm-3">
-              <img src="{{images[4].path}}" class="img-responsive" alt="{{model.name}}">
-            </div>
+            {% if model %}
+                  <div class="col-md-6 col-sm-3">
+                    <img src="{{images[0].path}}" class="img-responsive" alt="{{model.name}}">
+                  </div>
+                  <div class="col-md-4 col-sm-3">
+                    <h4>{{model.name}}</h4>
+                    <span class="text-muted">${{model.price}}</span>
+                    <div><p><p>
+                    {{model.description}}
+                    </div>
+                  </div>
+                  <div class="col-md-2 col-sm-3">
+                    <p>
+                      {% if email %}
 
-          </div>
+                            <form action="/checkout/{{model.id}}" method="POST">
+                              <script
+                                src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                                data-key="{{key}}"
+                                data-name="Authentise"
+                                data-description="{{model.id}} {{model.description}}"
+                                data-amount="{{model.price * 100}}">
+                                <button type="submit" class="btn btn-primary">Buy this model</button>
+                              </script>
+                            </form>
+                      {% else %}
+                            <a href="/login" class="btn btn-primary">Login to buy this model</a>
+                      {% endif%}
+                    </p>
+                    <small>
+                    <p><b>Read before you buy</b></p>
+                    <p>  What printers are compatible?</p>
+                    <p>  List of compatible printers</p>
+                    <p>  What am I buying?</p>
+                    <p>  The right to print a model once...</p>
+                    <p>  Do I get a file?</p>
+                    <p>  No, you get a stream that can...</p>
+                    </small>
+                  </div>
+                </div>
+                <p>
+                <div class="row">
+                  <div class="col-md-3 col-sm-3">
+                    <img src="{{images[1].path}}" class="img-responsive" alt="{{model.name}}">
+                  </div>
+                  <div class="col-md-3 col-sm-3">
+                    <img src="{{images[2].path}}" class="img-responsive" alt="{{model.name}}">
+                  </div>
+                  <div class="col-md-3 col-sm-3">
+                    <img src="{{images[3].path}}" class="img-responsive" alt="{{model.name}}">
+                  </div>
+                  <div class="col-md-3 col-sm-3">
+                    <img src="{{images[4].path}}" class="img-responsive" alt="{{model.name}}">
+                  </div>
+                </div>
+            {% else %}
+                <div class="alert alert-danger" role="alert">Action could't be performed: {{ error }}<p>
+                <a href="/shop">Back</a>
+                </div>
+            {% endif %}
         </div>
-        {% else %}
-            <div class="alert alert-danger" role="alert">
-
-            Model does not exist. <a href="/shop">Back</a>
-
-            {{ error }}
-
-            </div>
-        {% endif %}
 
       </div>
     </div>

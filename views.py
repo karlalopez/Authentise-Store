@@ -1,11 +1,11 @@
 from flask import render_template, request, redirect, session, jsonify, url_for
 from models import *
-from app import app
+from app import *
 from werkzeug import secure_filename
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/login')
 def login():
@@ -89,14 +89,54 @@ def product(id):
         print "Logged-in: Found session"
         email = session['email']
         model = get_model_by_id(id)
-        images = get_images_by_model_id(id)
+        if model:
+            images = get_images_by_model_id(id)
+            error = " "
+        else:
+            error = "Model does not exist."
+            images = " "
         collections = get_collections()
-        return render_template('product.html', email=email, model=model, images=images, collections=collections)
+        return render_template('product.html', error=error, email=email, model=model, images=images, collections=collections, key=stripe_keys['publishable_key'])
     else:
         model = get_model_by_id(id)
         images = get_images_by_model_id(id)
         collections = get_collections()
-        return render_template('product.html', email=email, model=model, images=images, collections=collections)
+        return render_template('product.html', model=model, images=images, collections=collections, key=stripe_keys['publishable_key'])
+
+@app.route('/checkout/<id>', methods=['POST'])
+def checkout(id):
+    if session.get('email'):
+        print "Logged-in: Found session"
+        email = session['email']
+        model = get_model_by_id(id)
+        collections = get_collections()
+        # create authentise token
+        authentise_token = "045234rfjwkeh83453rf"
+        new_token = create_token(authentise_token, model.price, model.id, email)
+        amount = int(model.price * 100)
+
+        customer = stripe.Customer.create(
+            email=email,
+            card=request.form['stripeToken']
+        )
+
+        charge = stripe.Charge.create(
+            customer=customer.id,
+            amount=amount,
+            currency='usd',
+            description='Flask Charge'
+        )
+        if charge.status == 'succeeded':
+            stripe_charge_id = charge.id
+            token = update_token(new_token, stripe_charge_id)
+            return render_template('checkout.html', amount=amount, token=token, email=email, model=model, collections=collections)
+        else:
+            error = "We are very sorry, but there was a problem with your purchase. Please try again."
+            return render_template('product.html', email=email, model=model, collections=collections, error=error)
+
+    else:
+        return render_template('login.html')
+
 
 @app.route('/collection/<id>')
 def collection(id):

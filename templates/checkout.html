@@ -1,0 +1,47 @@
+{% include 'header.html' %}
+<link href="/static/dashboard.css" rel="stylesheet">
+<link href="/static/carousel.css" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+
+{% include 'navbar.html' %}
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="/shop">Home<span class="sr-only">(current)</span></a></li>
+            {% for collection in collections %}
+                {% if collection_name == collection.name %}
+                <li class="active"><a href="/collection/{{collection.id}}">{{collection.name}}</a></li>
+                {% else %}
+                <li><a href="/collection/{{collection.id}}">{{collection.name}}</a></li>
+                {% endif %}
+            {% endfor %}
+
+          </ul>
+        </div>
+        {% if model %}
+
+        <div class="col-md-9 col-md-offset-2 main">
+          <div class="row">
+              {{token.authentise_token}}<p>
+              {{token.stripe_charge_id}}<p>
+              {{token.user_email}}<p>
+          </div>
+        </div>
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+
+            Model does not exist. <a href="/shop">Back</a>
+
+            {{ error }}
+
+            </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </body>
+</html>
