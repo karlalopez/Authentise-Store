@@ -115,9 +115,6 @@ def checkout(id):
         email = session['email']
         model = get_model_by_id(id)
         collections = get_collections()
-        # create authentise token
-        authentise_token = "045234rfjwkeh83453rf"
-        new_token = create_token(authentise_token, model.price, model.id, email)
         amount = int(model.price * 100)
 
         customer = stripe.Customer.create(
@@ -131,11 +128,19 @@ def checkout(id):
             currency='usd',
             description='Flask Charge'
         )
-        if charge.status == 'succeeded':
+        print vars(charge)
+
+        token = create_token(model.price, model.id, email)
+
+        if charge.status == 'paid':
             stripe_charge_id = charge.id
-            token = update_token(new_token, stripe_charge_id)
             popularity = update_model_popularity(model)
             token_link = create_authentise_token(model,token)
+            authentise_token,authentise_link = token_link
+            print authentise_token
+            print authentise_link
+            token = update_token(authentise_token, stripe_charge_id)
+
             return render_template('checkout.html', amount=amount, token=token, email=email, model=model, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
         else:
             error = "We are very sorry, but there was a problem with your purchase. Please try again."

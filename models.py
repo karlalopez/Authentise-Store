@@ -74,8 +74,7 @@ class Token(db.Model):
     user_email = db.Column(db.String(100), db.ForeignKey('user.email'))
     user = db.relationship("User", backref="token")
 
-    def __init__(self, authentise_token, date_added, price_paid, model_id, user_email, stripe_charge_id=None):
-        self.authentise_token = authentise_token
+    def __init__(self,date_added, price_paid, model_id, user_email, authentise_token=None, stripe_charge_id=None):
         self.date_added = today
         self.price_paid = price_paid
         self.model_id = model_id
@@ -363,9 +362,9 @@ def get_token_by_id(id):
     token = Token.query.filter_by(id=id).first()
     return token
 
-def create_token(authentise_token, price_paid, model_id, user_email):
+def create_token(price_paid, model_id, user_email):
     date_added = today
-    token = Token(authentise_token, date_added, price_paid, model_id, user_email)
+    token = Token(date_added, price_paid, model_id, user_email)
     print "new Token"
     try:
         db.session.add(token)
@@ -378,8 +377,9 @@ def create_token(authentise_token, price_paid, model_id, user_email):
         print e
         return e
 
-def update_token(token, stripe_charge_id):
+def update_token(token, authentise_token, stripe_charge_id):
     print "token update"
+    token.authentise_token = authentise_token
     token.stripe_charge_id = stripe_charge_id
     try:
         db.session.commit()
