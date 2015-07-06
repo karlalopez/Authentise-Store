@@ -30,47 +30,12 @@
                     </tr>
                   </thead>
                   <tbody>
+                    {% for token in tokens %}
                     <tr>
-                      <td>1,001</td>
-                      <td>Lorem</td>
+                      <td>{{token.price_paid}}</td>
+                      <td>{{token_status[loop.index]}}</td>
                     </tr>
-                    <tr>
-                      <td>1,002</td>
-                      <td>amet</td>
-                    </tr>
-                    <tr>
-                      <td>1,003</td>
-                      <td>Integer</td>
-                    </tr>
-                    <tr>
-                      <td>1,001</td>
-                      <td>Lorem</td>
-                    </tr>
-                    <tr>
-                      <td>1,002</td>
-                      <td>amet</td>
-                    </tr>
-                    <tr>
-                      <td>1,003</td>
-                      <td>Integer</td>
-                    </tr>
-                    <tr>
-                      <td>1,001</td>
-                      <td>Lorem</td>
-                    </tr>
-                    <tr>
-                      <td>1,002</td>
-                      <td>amet</td>
-                    </tr>
-                    <tr>
-                      <td>1,003</td>
-                      <td>Integer</td>
-                    </tr>
-                    <tr>
-                      <td>1,001</td>
-                      <td>Lorem</td>
-                    </tr>
-
+                    {% endfor %}
                   </tbody>
                 </table>
               </div>
@@ -86,45 +51,12 @@
                       </tr>
                     </thead>
                     <tbody>
-                        <td>1,003</td>
-                        <td>Integer</td>
-                      </tr>
-                      <tr>
-                        <td>1,001</td>
-                        <td>Lorem</td>
-                      </tr>
-                      <tr>
-                        <td>1,002</td>
-                        <td>amet</td>
-                      </tr>
-                      <tr>
-                        <td>1,003</td>
-                        <td>Integer</td>
-                      </tr>
-                      <tr>
-                        <td>1,001</td>
-                        <td>Lorem</td>
-                      </tr>
-                      <tr>
-                        <td>1,002</td>
-                        <td>amet</td>
-                      </tr>
-                      <tr>
-                        <td>1,003</td>
-                        <td>Integer</td>
-                      </tr>
-                      <tr>
-                        <td>1,001</td>
-                        <td>Lorem</td>
-                      </tr>
-                      <tr>
-                        <td>1,002</td>
-                        <td>amet</td>
-                      </tr>
-                      <tr>
-                        <td>1,003</td>
-                        <td>Integer</td>
-                      </tr>
+                      {% for model in models %}
+                        <tr>
+                          <td>{{model.name}}</td>
+                          <td>{{model.date_added}}</td>
+                        </tr>
+                      {% endfor %}
                     </tbody>
                   </table>
                 </div>
@@ -140,47 +72,12 @@
                     </tr>
                   </thead>
                   <tbody>
+                    {% for user in users %}
                     <tr>
-                      <td>1,002</td>
-                      <td>amet</td>
+                      <td>{{user.email}}</td>
+                      <td>{{user.date_added}}</td>
                     </tr>
-                    <tr>
-                      <td>1,001</td>
-                      <td>Lorem</td>
-                    </tr>
-                    <tr>
-                      <td>1,002</td>
-                      <td>amet</td>
-                    </tr>
-                    <tr>
-                      <td>1,003</td>
-                      <td>Integer</td>
-                    </tr>
-                    <tr>
-                      <td>1,001</td>
-                      <td>Lorem</td>
-                    </tr>
-                    <tr>
-                      <td>1,002</td>
-                      <td>amet</td>
-                    </tr>
-                    <tr>
-                      <td>1,003</td>
-                      <td>Integer</td>
-                    </tr>
-                    <tr>
-                      <td>1,001</td>
-                      <td>Lorem</td>
-                    </tr>
-                    <tr>
-                      <td>1,002</td>
-                      <td>amet</td>
-                    </tr>
-                    <tr>
-                      <td>1,003</td>
-                      <td>Integer</td>
-                    </tr>
-
+                    {% endfor %}
                   </tbody>
                 </table>
               </div>

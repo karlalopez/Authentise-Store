@@ -5,8 +5,6 @@ import os
 import stripe
 
 
-AUTHENTISE_KEY = "AUTHENTISE_API_KEY"
-
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join('static/uploads')
 MODELS_FOLDER = os.path.join('models')

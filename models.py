@@ -3,7 +3,10 @@ import datetime
 import os
 from werkzeug import secure_filename
 from app import app
+import json
+import requests
 
+AUTHENTISE_KEY = os.environ['AUTHENTISE_API_KEY']
 
 today = datetime.datetime.today()
 todayiso = today.isoformat()
@@ -99,6 +102,9 @@ def get_users():
     users = User.query.all()
     return users
 
+def get_10_users():
+    users = User.query.limit(10)
+    return users
 
 def get_user_by_email(email):
     return User.query.filter_by(email=email).first()
@@ -160,6 +166,11 @@ def get_models():
     models = Model.query.filter_by(active='True').all()
     return models
 
+def get_10_models():
+    models = Model.query.filter_by(active='True').limit(10)
+    return models
+
+
 def get_models_by_collection(id):
     models = Model.query.filter_by(collection_id=id,active='True').all()
     return models
@@ -214,6 +225,15 @@ def update_model(model, model_name, model_description, model_dimensions, model_c
         # If something went wrong, explicitly roll back the database
         db.session.rollback()
 
+def update_model_popularity(model):
+    print "Model popularity update"
+    model.popularity += 1
+    try:
+        db.session.commit()
+        return model
+    except:
+        # If something went wrong, explicitly roll back the database
+        db.session.rollback()
 
 def deactivate_model(id):
     model = Model.query.get(id)
@@ -331,6 +351,10 @@ def get_tokens():
     tokens = Token.query.all()
     return tokens
 
+def get_10_tokens():
+    tokens = Token.query.limit(10)
+    return tokens
+
 def get_tokens_by_email(email):
     tokens = Token.query.filter_by(user_email=user_email).all()
     return token
@@ -363,6 +387,78 @@ def update_token(token, stripe_charge_id):
     except:
         # If something went wrong, explicitly roll back the database
         db.session.rollback()
+
+def create_authentise_token(model,token):
+    # Step 1: GET token
+
+    # GET request for api_create_partner_token
+    print 'https://print.authentise.com/api3/api_create_partner_token?api_key={}'.format(AUTHENTISE_KEY)
+    authentise_request = requests.get('https://print.authentise.com/api3/api_create_partner_token?api_key={}'.format(AUTHENTISE_KEY))
+
+    # Parse json output
+    print authentise_request
+    resp = json.loads(authentise_request.text)
+    data = resp[u'data']
+    authentise_token = data[u'token']
+
+    # Print results
+    print "Token obtained: {}".format(authentise_token)
+    print "\nUploading 3D file and getting token link...\n"
+
+    # Step 2:
+    # a) POST stl file with associated purchase value
+    # b) obtain token_link (url) to access widget
+
+    print_value = token.price_paid  # price of the purchased 3D file
+    email = token.user_email    # customer email
+    file_name = '.{}'.format(model.path) # customer purchased 3D file
+    print file_name
+
+    # POST request for api_upload_partner_stl
+    url = "https://print.authentise.com/api3/api_upload_partner_stl?\
+    api_key={}&\
+    receiver_email={}&\
+    print_value={}&\
+    token={}".format(AUTHENTISE_KEY, email, print_value, authentise_token)
+    print url
+
+    files = {'stl_file': open(file_name, 'rb')}
+    print files
+
+    # Parse json output
+    authentise_request = requests.post(url, files=files)
+    print authentise_request
+    resp = json.loads(authentise_request.text)
+    data = resp[u'data']
+    ssl_token_link = data['ssl_token_link']
+
+    # Print results
+    print "Link to print"
+    print ssl_token_link
+    return (ssl_token_link, authentise_token)
+
+# def get_token_print_status(token):
+#     #GET /api3/api_get_partner_print_status
+#     url = "https://print.authentise.com/api3//api3/api_get_partner_print_status?\
+#     api_key={}&\
+#     token={}".format(AUTHENTISE_KEY, email, print_value,authentise_token)
+#
+#     # Parse json output
+#     authentise_request = requests.get(url)
+#     resp = json.loads(authentise_request.text)
+#     status = resp[u'printing_job_status']
+#
+#     # Print results
+#     print "Token status: {}".format(status)
+#     return status
+#
+# def get_token_list_status(tokens):
+#     token_status = []
+#     for token in tokens:
+#         status = get_token_print_status(token.authentise_token)
+#         token_status.append(status)
+#     return token_status
+
 
 
 if __name__ == "__main__":

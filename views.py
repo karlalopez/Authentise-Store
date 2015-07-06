@@ -134,6 +134,8 @@ def checkout(id):
         if charge.status == 'succeeded':
             stripe_charge_id = charge.id
             token = update_token(new_token, stripe_charge_id)
+            popularity = update_model_popularity(model)
+            token_link = create_authentise_token(model,token)
             return render_template('checkout.html', amount=amount, token=token, email=email, model=model, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
         else:
             error = "We are very sorry, but there was a problem with your purchase. Please try again."
@@ -149,7 +151,13 @@ def admin():
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            return render_template('admin.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+            models = get_10_models()
+            tokens = get_10_tokens()
+            token_status = ""
+            # token_status = get_token_list_status(tokens)
+            users = get_10_users()
+            print users
+            return render_template('admin.html', models=models, tokens=tokens, token_status=token_status, users=users, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 
@@ -163,7 +171,10 @@ def adminmodels():
         user = get_user_by_email(email)
         models = get_models()
         if user.admin == True:
-            return render_template('admin-models.html', models=models,email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+            models = get_10_models()
+            tokens = get_10_tokens()
+            users = get_10_users()
+            return render_template('admin-models.html', models=models, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 @app.route('/admin-models/<id>', methods=['GET', 'POST'])
@@ -322,8 +333,9 @@ def adminorders():
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            # delete function
-            return render_template('admin-orders.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+            tokens = get_tokens()
+            token_status = get_token_list_status(tokens)
+            return render_template('admin-orders.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline, tokens=tokens, token_status=token_status)
     return redirect('/shop')
 
 @app.route('/admin-order/<id>', methods=['GET', 'POST'])
@@ -332,8 +344,11 @@ def adminorder_view(id):
         print "Logged-in: Found session"
         email = session['email']
         user = get_user_by_email(email)
+        token = get_token_by_id(id)
+        token_status = ""
+        # token_status = get_token_print_status(token.authentise_token)
         if user.admin == True:
-            return render_template('view-orders.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+            return render_template('view-order.html', email=email, token=token, token_status=token_status, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
 
 @app.route('/admin-order/delete/<id>', methods=['GET', 'POST'])
