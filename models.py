@@ -11,6 +11,7 @@ import time
 
 
 AUTHENTISE_KEY = os.environ['AUTHENTISE_API_KEY']
+LOGGER = logging.getLogger(__name__)
 
 today = datetime.datetime.today()
 todayiso = today.isoformat()
@@ -117,7 +118,7 @@ def get_user_by_id(id):
 
 
 def create_user(email, password): # Try?
-    print User.query.count()
+    LOGGER.info(User.query.count())
     if User.query.count() == 0:
         admin = True
         date_added = today
@@ -188,7 +189,7 @@ def allowed_file(filename):
 
 def save_model(file):
     filename = "{}{}".format(todayiso,secure_filename(file.filename))
-    print filename
+    LOGGER.info(filename)
     file.save(os.path.join(app.config['MODELS_FOLDER'], filename))
 
     model_path = "/{}/{}".format(app.config['MODELS_FOLDER'], filename)
@@ -201,26 +202,26 @@ def create_model(model_name, model_path, model_description, model_dimensions, mo
 
     try:
         db.session.add(model)
-        print "db.add"
+        LOGGER.info("db.add")
         db.session.commit()
-        print "db.commit"
+        LOGGER.info("db.commit")
         return model
     except Exception as e:
         db.session.rollback()
-        print e
+        LOGGER.info(e)
         return e
 
 def update_model(model, model_name, model_description, model_dimensions, model_collection, model_price):
     # if user_email is None or user_email == '':
     #     raise Exception("Model needs a valid info")
-    print "Model update"
+    LOGGER.info("Model update")
     model.name = model_name
     model.description = model_description
     model.dimensions = model_dimensions
     model.collection_id = model_collection
-    print model_collection
+    LOGGER.info(model_collection)
     model.price = model_price
-    print model.price
+    LOGGER.info(model.price)
     try:
         db.session.commit()
         return model
@@ -229,7 +230,7 @@ def update_model(model, model_name, model_description, model_dimensions, model_c
         db.session.rollback()
 
 def update_model_popularity(model):
-    print "Model popularity update"
+    LOGGER.info("Model popularity update")
     model.popularity += 1
     try:
         db.session.commit()
@@ -241,7 +242,7 @@ def update_model_popularity(model):
 def deactivate_model(id):
     model = Model.query.get(id)
     if model:
-        print "Model deactivation"
+        LOGGER.info("Model deactivation")
         model.active = False
         try:
             db.session.commit()
@@ -260,13 +261,13 @@ def add_images_to_model(path, model_id):
 
     try:
         db.session.add(image)
-        print "db.add"
+        LOGGER.info("db.add")
         db.session.commit()
-        print "db.commit"
+        LOGGER.info("db.commit")
         return image
     except Exception as e:
         db.session.rollback()
-        print e
+        LOGGER.info(e)
         return e
 
 def save_images(model_to_create, model_image1, model_image2, model_image3, model_image4, model_image5):
@@ -278,7 +279,7 @@ def save_images(model_to_create, model_image1, model_image2, model_image3, model
     for image in images:
         if image != None or image != "":
             filename = "{}{}".format(todayiso,secure_filename(image.filename))
-            print filename
+            LOGGER.info(filename)
             image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
             image_path = "/{}/{}".format(app.config['UPLOAD_FOLDER'], filename)
@@ -286,7 +287,7 @@ def save_images(model_to_create, model_image1, model_image2, model_image3, model
                 save_image = add_images_to_model(image_path, model_id)
             except Exception as e:
                 db.session.rollback()
-                print e
+                LOGGER.info(e)
                 return e
 
 
@@ -296,7 +297,7 @@ def save_images(model_to_create, model_image1, model_image2, model_image3, model
 def get_collections():
     collections = Collection.query.filter_by(active='True').all()
     for collection in collections:
-        print collection.name
+        LOGGER.info(collection.name)
     return collections
 
 def get_collection_name_by_id(id):
@@ -309,22 +310,22 @@ def get_collection_by_id(id):
 
 def create_collection(collection_name, collection_description):
     collection = Collection(collection_name, collection_description)
-    print "new Collection"
+    LOGGER.info("new Collection")
     try:
         db.session.add(collection)
-        print "db.add"
+        LOGGER.info("db.add")
         db.session.commit()
-        print "db.commit"
+        LOGGER.info("db.commit")
         return collection
     except Exception as e:
         db.session.rollback()
-        print e
+        LOGGER.info(e)
         return e
 
 def update_collection(collection, collection_name, collection_description):
     # if user_email is None or user_email == '':
     #     raise Exception("Model needs a valid info")
-    print "Collection update"
+    LOGGER.info("Collection update")
     collection.name = collection_name
     collection.description = collection_description
     try:
@@ -338,7 +339,7 @@ def update_collection(collection, collection_name, collection_description):
 def deactivate_collection(id):
     collection = Collection.query.get(id)
     if collection:
-        print "Collection deactivation"
+        LOGGER.info("Collection deactivation")
         collection.active = False
         try:
             db.session.commit()
@@ -369,20 +370,20 @@ def get_token_by_id(id):
 def create_token(price_paid, model_id, user_email):
     date_added = today
     token = Token(date_added, price_paid, model_id, user_email)
-    print "new Token"
+    LOGGER.info("new Token")
     try:
         db.session.add(token)
-        print "db.add"
+        LOGGER.info("db.add")
         db.session.commit()
-        print "db.commit"
+        LOGGER.info("db.commit")
         return token
     except Exception as e:
         db.session.rollback()
-        print e
+        LOGGER.info(e)
         return e
 
 def update_token(token, authentise_token, stripe_charge_id):
-    print "token update"
+    LOGGER.info("token update")
     token.authentise_token = authentise_token
     token.stripe_charge_id = stripe_charge_id
     try:
@@ -433,11 +434,11 @@ def create_authentise_token(model,token):
     print_value = token.price_paid  # price of the purchased 3D file
     email = token.user_email    # customer email
     file_name = '.{}'.format(model.path) # customer purchased 3D file
-    print file_name
+    LOGGER.info(file_name)
 
     result = authentise_upload_stl(file_name, authentise_token, print_value, email)
     authentise_token_link = result['data']['ssl_token_link']
-    print authentise_token_link
+    LOGGER.info(authentise_token_link)
     # LOGGER.info("Token link: %s", token_link)
 
     return authentise_token, authentise_token_link
@@ -448,7 +449,7 @@ def get_token_print_status(authentise_token):
     url = "https://print.authentise.com/api3/api_get_partner_print_status?\
     api_key={}&\
     token={}".format(AUTHENTISE_KEY, authentise_token)
-    print url
+    LOGGER.info(url)
 
     # Parse json output
     authentise_request = requests.get(url)
@@ -458,7 +459,7 @@ def get_token_print_status(authentise_token):
     status = resp[u'printing_job_status']
 
     # Print results
-    print "Token status: {}".format(status)
+    LOGGER.info("Token status: %s", status)
     return status
 #
 # def get_token_list_status(tokens):
@@ -473,6 +474,6 @@ def get_token_print_status(authentise_token):
 if __name__ == "__main__":
 
     # Run this file directly to create the database tables.
-    print "Creating database tables..."
+    LOGGER.info("Creating database tables...")
     db.create_all()
-    print "Done!"
+    LOGGER.info("Done!")
