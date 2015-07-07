@@ -22,19 +22,22 @@
 
           </ul>
         </div>
-        {% if model %}
+        {% if authentise_link %}
 
         <div class="col-md-9 col-md-offset-2 main">
           <div class="row">
-              {{token.authentise_token}}<p>
-              {{token.stripe_charge_id}}<p>
-              {{token.user_email}}<p>
+            <div class="col-md-6 col-sm-3">
+              <img src="{{image_path}}" class="img-responsive" alt="{{model.name}}"><br>
+              <h4>{{model.name}}</h4>
+            </div>
+            <div class="col-md-4 col-sm-3">
+            <iframe src="{{authentise_link}}" width="400" height="400"></iframe>
           </div>
         </div>
         {% else %}
             <div class="alert alert-danger" role="alert">
 
-            Model does not exist. <a href="/shop">Back</a>
+            Purchase not completed. <a href="/shop">Back</a>
 
             {{ error }}
 

@@ -83,6 +83,21 @@ def shop():
         models = get_models()
         return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
+@app.route('/collection/<id>')
+def collection(id):
+    if session.get('email'):
+        print "Logged-in: Found session"
+        email = session['email']
+        collections = get_collections()
+        models = get_models_by_collection(id)
+        collection_name = get_collection_name_by_id(id)
+        return render_template('shop.html', email=email, models=models, collections=collections, collection_name=collection_name)
+    else:
+        collections = get_collections()
+        models = get_models_by_collection(id)
+        collection_id = id
+        return render_template('shop.html', models=models, collections=collections, collection_id=collection_id)
+
 @app.route('/product/<id>')
 def product(id):
     if session.get('email'):
@@ -116,6 +131,8 @@ def checkout(id):
         model = get_model_by_id(id)
         collections = get_collections()
         amount = int(model.price * 100)
+        images = get_images_by_model_id(id)
+        image_path = images[0].path
 
         customer = stripe.Customer.create(
             email=email,
@@ -138,10 +155,10 @@ def checkout(id):
             authentise_token, authentise_link = token_link
             print authentise_token
             print authentise_link
-            
+
             token = update_token(token, authentise_token, stripe_charge_id)
 
-            return render_template('checkout.html', amount=amount, token=token, email=email, model=model, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+            return render_template('checkout.html', authentise_link=authentise_link, image_path=image_path, email=email, model=model, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
         else:
             error = "We are very sorry, but there was a problem with your purchase. Please try again."
             return render_template('product.html', email=email, model=model, collections=collections, error=error, shop_name=shop_name, shop_tagline=shop_tagline)
@@ -350,8 +367,7 @@ def adminorder_view(id):
         email = session['email']
         user = get_user_by_email(email)
         token = get_token_by_id(id)
-        token_status = ""
-        # token_status = get_token_print_status(token.authentise_token)
+        token_status = get_token_print_status(token.authentise_token)
         if user.admin == True:
             return render_template('view-order.html', email=email, token=token, token_status=token_status, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/shop')
@@ -443,5 +459,35 @@ def profile():
         email = session['email']
         user = get_user_by_email(email)
         if user.admin == True:
-            return render_template('profile.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+            tokens = get_tokens_by_email(email)
+            models = []
+            statuses = []
+            token_ids = []
+            for model in tokens:
+                m = get_model_by_id(model.model_id)
+                models.append(m.name)
+            for token in tokens:
+                # s = get_token_print_status(token.authentise_token)
+                # statuses.append(s)
+                token_ids.append(token.id)
+            return render_template('profile.html', models=models, statuses=statuses, token_ids=token_ids, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/login')
+
+@app.route('/print/<id>')
+def print_order(id):
+    if session.get('email'):
+        print "Logged-in: Found session"
+        email = session['email']
+        token = get_token_by_id(id)
+        model = get_model_by_id(token.model_id)
+        collections = get_collections()
+        images = get_images_by_model_id(token.model_id)
+        image_path = images[0].path
+
+        authentise_link = "http://app.authentise.com/#/widget/{}".format(token.authentise_token)
+        print authentise_link
+
+        return render_template('checkout.html', authentise_link=authentise_link, image_path=image_path, email=email, model=model, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+
+    else:
+        return render_template('login.html')

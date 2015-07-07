@@ -28,10 +28,12 @@
               <td> Model</td>
               <td> Status</td>
             </tr>
+              {% for model in models %}
               <tr>
-                <td>model name link</td>
-                <td>status</td>
+                <td>{{model}}</td>
+                <td><a href="/print/{{token_ids[loop.index]}}"> Print {{statuses[loop.index]}}</a></td>
               </tr>
+              {% endfor %}
           </table>
         </div>
       </div>

@@ -357,9 +357,9 @@ def get_10_tokens():
     tokens = Token.query.limit(10)
     return tokens
 
-def get_tokens_by_email(email):
+def get_tokens_by_email(user_email):
     tokens = Token.query.filter_by(user_email=user_email).all()
-    return token
+    return tokens
 
 def get_token_by_id(id):
     token = Token.query.filter_by(id=id).first()
@@ -442,23 +442,23 @@ def create_authentise_token(model,token):
     return authentise_token, authentise_token_link
 
 
+def get_token_print_status(authentise_token):
+    #GET /api3/api_get_partner_print_status
+    url = "https://print.authentise.com/api3/api_get_partner_print_status?\
+    api_key={}&\
+    token={}".format(AUTHENTISE_KEY, authentise_token)
+    print url
 
+    # Parse json output
+    authentise_request = requests.get(url)
+    print authentise_request
+    resp = json.loads(authentise_request.text)
+    print resp
+    status = resp[u'printing_job_status']
 
-
-# def get_token_print_status(token):
-#     #GET /api3/api_get_partner_print_status
-#     url = "https://print.authentise.com/api3//api3/api_get_partner_print_status?\
-#     api_key={}&\
-#     token={}".format(AUTHENTISE_KEY, email, print_value,authentise_token)
-#
-#     # Parse json output
-#     authentise_request = requests.get(url)
-#     resp = json.loads(authentise_request.text)
-#     status = resp[u'printing_job_status']
-#
-#     # Print results
-#     print "Token status: {}".format(status)
-#     return status
+    # Print results
+    print "Token status: {}".format(status)
+    return status
 #
 # def get_token_list_status(tokens):
 #     token_status = []
