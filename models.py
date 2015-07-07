@@ -1,11 +1,12 @@
-from app import db, ALLOWED_EXTENSIONS
-import datetime
-import os
+from app import app, db, ALLOWED_EXTENSIONS
 from werkzeug import secure_filename
-from app import app
-import json
-import requests
+
 import argparse
+import datetime
+import json
+import logging
+import os
+import requests
 import time
 
 
