@@ -2,26 +2,18 @@ from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug import secure_filename
 import os
-import stripe
+
+# Enter here your shop name and tagline
+shop_name = "Shop name"
+shop_tagline = "Best shop tagline ever"
+
 
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join('static/uploads')
 MODELS_FOLDER = os.path.join('models')
 
-
 ALLOWED_EXTENSIONS = set(['stl'])
-
-stripe_keys = {
-    'secret_key': os.environ['SECRET_KEY'],
-    'publishable_key': os.environ['PUBLISHABLE_KEY']
-}
-
-stripe.api_key = stripe_keys['secret_key']
-
-shop_name = "Shop name"
-shop_tagline = "Best shop tagline ever"
-
 
 app = Flask(__name__)
 app.secret_key = 'thisisasecret' #You need to set up an app secret key.

@@ -42,7 +42,7 @@
                               <script
                                 src="https://checkout.stripe.com/checkout.js" class="stripe-button"
                                 data-key="{{key}}"
-                                data-name="Authentise"
+                                data-name={{shop_name}}
                                 data-description="{{model.id}} {{model.description}}"
                                 data-amount="{{model.price * 100}}">
                                 <button type="submit" class="btn btn-primary">Buy this model</button>
