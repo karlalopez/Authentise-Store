@@ -5,9 +5,6 @@ import os
 base = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(base)
 
-import pprint
-pprint.pprint(sys.path)
-
 import argparse
 import logging
 import models
