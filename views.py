@@ -128,7 +128,6 @@ def checkout(id):
             currency='usd',
             description='Flask Charge'
         )
-        print vars(charge)
 
         token = create_token(model.price, model.id, email)
 
@@ -136,10 +135,11 @@ def checkout(id):
             stripe_charge_id = charge.id
             popularity = update_model_popularity(model)
             token_link = create_authentise_token(model,token)
-            authentise_token,authentise_link = token_link
+            authentise_token, authentise_link = token_link
             print authentise_token
             print authentise_link
-            token = update_token(authentise_token, stripe_charge_id)
+            
+            token = update_token(token, authentise_token, stripe_charge_id)
 
             return render_template('checkout.html', amount=amount, token=token, email=email, model=model, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
         else:

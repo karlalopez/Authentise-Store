@@ -5,6 +5,9 @@ from werkzeug import secure_filename
 from app import app
 import json
 import requests
+import argparse
+import time
+
 
 AUTHENTISE_KEY = os.environ['AUTHENTISE_API_KEY']
 
@@ -388,54 +391,59 @@ def update_token(token, authentise_token, stripe_charge_id):
         # If something went wrong, explicitly roll back the database
         db.session.rollback()
 
+def authentise_create_token():
+    url = 'https://print.authentise.com/api3/api_create_partner_token'
+    response = requests.get(url, data={'api_key': AUTHENTISE_KEY})
+    if not response.ok:
+        raise Exception("Failed to create token: {} {}".format(response.status_code, response.text))
+    return response.json()
+
+def authentise_upload_stl(file_name, token_authentise, print_value, email):
+    payload = {
+        'api_key'               : AUTHENTISE_KEY,
+        'token'                 : token_authentise,
+        'receiver_email'        : email,
+        'print_value'           : print_value,
+        'print_value_currency'  : 'USD',
+    }
+    url = 'https://print.authentise.com/api3/api_upload_partner_stl'
+    with open(file_name, 'rb') as f:
+        response = requests.post(url, data=payload, files={'stl_file': f})
+    if not response.ok:
+        raise Exception("Failed to upload {} to token {}: {} {}".format(file_name, token_authentise, response.status_code, response.text))
+    return response.json()
+
+
 def create_authentise_token(model,token):
-    # Step 1: GET token
+    ROOT = 'authentise.com'
+    # LOGGER = logging.getLogger('test')
+    # logging.basicConfig()
+    # logging.getLogger().setLevel(logging.DEBUG)
 
-    # GET request for api_create_partner_token
-    print 'https://print.authentise.com/api3/api_create_partner_token?api_key={}'.format(AUTHENTISE_KEY)
-    authentise_request = requests.get('https://print.authentise.com/api3/api_create_partner_token?api_key={}'.format(AUTHENTISE_KEY))
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('stl', help="The STL file to upload")
+    # args = parser.parse_args()
 
-    # Parse json output
-    print authentise_request
-    resp = json.loads(authentise_request.text)
-    data = resp[u'data']
-    authentise_token = data[u'token']
-
-    # Print results
-    print "Token obtained: {}".format(authentise_token)
-    print "\nUploading 3D file and getting token link...\n"
-
-    # Step 2:
-    # a) POST stl file with associated purchase value
-    # b) obtain token_link (url) to access widget
+    result = authentise_create_token()
+    authentise_token = result['data']['token']
+    # LOGGER.info("Received token %s", token)
+    # LOGGER.info("Uploading STL file")
 
     print_value = token.price_paid  # price of the purchased 3D file
     email = token.user_email    # customer email
     file_name = '.{}'.format(model.path) # customer purchased 3D file
     print file_name
 
-    # POST request for api_upload_partner_stl
-    url = "https://print.authentise.com/api3/api_upload_partner_stl?\
-    api_key={}&\
-    receiver_email={}&\
-    print_value={}&\
-    token={}".format(AUTHENTISE_KEY, email, print_value, authentise_token)
-    print url
+    result = authentise_upload_stl(file_name, authentise_token, print_value, email)
+    authentise_token_link = result['data']['ssl_token_link']
+    print authentise_token_link
+    # LOGGER.info("Token link: %s", token_link)
 
-    files = {'stl_file': open(file_name, 'rb')}
-    print files
+    return authentise_token, authentise_token_link
 
-    # Parse json output
-    authentise_request = requests.post(url, files=files)
-    print authentise_request
-    resp = json.loads(authentise_request.text)
-    data = resp[u'data']
-    ssl_token_link = data['ssl_token_link']
 
-    # Print results
-    print "Link to print"
-    print ssl_token_link
-    return (ssl_token_link, authentise_token)
+
+
 
 # def get_token_print_status(token):
 #     #GET /api3/api_get_partner_print_status
