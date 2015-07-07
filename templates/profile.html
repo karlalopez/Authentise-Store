@@ -3,43 +3,45 @@
 
 {% include 'navbar.html' %}
 
-  <div class="container">
+<div class="container">
   <div class="starter-template">
-    <div class="starter-template">
-      <h3>Change password </h3>
-        <form class="form-signin" action="change-password" method="POST" >
+    <h3>Change password </h3>
+    <form class="form-signin" action="change-password" method="POST" >
 
-          <p>Old Password:
-          <input type="password" name="old_password" class="form-control" required></p>
+      <p>Old Password: <input type="password" name="old_password" class="form-control" required></p>
 
-          <p>New Password:
-          <input type="password" id="pass1" name="new_password" class="form-control" required></p>
+      <p>New Password: <input type="password" id="pass1" name="new_password" class="form-control" required></p>
 
-          <p>Re-type new Password:
-          <input type="password" id="pass2" name="retype_password" required class="form-control" onkeyup="checkPass(); return false;"></p>
-          <p><span id="confirmMessage" class="confirmMessage"></span></p>
-          <p>
-          <input type="submit" value="Change password" class="btn btn-primary"></i>
-          </p>
-          <hr>
-          <h3>Your models</h3>
-          <table class="table table-striped">
-            <tr>
-              <td> Model</td>
-              <td> Status</td>
-            </tr>
-              {% for model in models %}
+      <p>Re-type new Password:<input type="password" id="pass2" name="retype_password" required class="form-control" onkeyup="checkPass(); return false;"></p>
+      <p><span id="confirmMessage" class="confirmMessage"></span></p>
+
+      <p><input type="submit" value="Change password" class="btn btn-primary"></i></p>
+  </div>
+  <hr>
+
+      <h3 class="text-center">Your order history</h3>
+      <table class="table table-striped">
               <tr>
-                <td>{{model}}</td>
-                <td><a href="/print/{{token_ids[loop.index]}}"> Print {{statuses[loop.index]}}</a></td>
+                <td> Model</td>
+                <td> Status</td>
+              </tr>
+              {% for token in tokens %}
+              <tr>
+                <td>{{token.model.name}}</td>
+                <td>
+                  {% if token_status[loop.index-1] == False %}
+                  <a href="/print/{{token.id}}" type="button" class="btn btn-primary"> Print </a>
+                  {% else %}
+                  <a href="/product/{{token.model.id}}" type="button" class="btn btn-default"> Buy! </a>
+                  {% endif %}
+                </td>
               </tr>
               {% endfor %}
-          </table>
-        </div>
-      </div>
+        </table>
 
 
-</div><!-- /.container -->
+
+        </div><!-- /.container -->
 
 
 <!-- Bootstrap core JavaScript

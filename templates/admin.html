@@ -33,7 +33,13 @@
                     {% for token in tokens %}
                     <tr>
                       <td>{{token.price_paid}}</td>
-                      <td>{{token_status[loop.index]}}</td>
+                      <td>
+                        {% if token_status[loop.index-1] == False %}
+                          Not printed
+                        {% else %}
+                          Expired
+                        {% endif %}
+                      </td>
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -41,7 +47,7 @@
               </div>
             </div>
             <div class="col-md-4 col-sm-4">
-                <h4> Last models</h4>
+                <h4> Last models added</h4>
                 <div class="table-responsive">
                   <table class="table table-striped">
                     <thead>
@@ -62,7 +68,7 @@
                 </div>
             </div>
             <div class="col-md-4 col-sm-4">
-              <h4> Last Users</h4>
+              <h4> Last user sign ups</h4>
               <div class="table-responsive">
                 <table class="table table-striped">
                   <thead>

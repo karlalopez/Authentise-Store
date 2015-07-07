@@ -35,11 +35,17 @@
                 <tbody>
                   {% for token in tokens %}
                   <tr>
-                    <td>{{token.id}}</td>
-                    <td><a href="/admin-models/{{token.id}}">{{token.model_id}}</a></td>
+                    <td>{{token.model_id}}</td>
+                    <td><a href="/admin-models/{{token.model.id}}">{{token.model.name}}</a></td>
                     <td>{{token.price_paid}}</td>
                     <td>{{token.date_added}}</td>
-                    <td>dolor</td>
+                    <td>
+                    {% if token_status[loop.index-1] == False %}
+                      Not printed
+                    {% else %}
+                      Expired
+                    {% endif %}
+                    </td>
                   </tr>
                   {% endfor %}
 

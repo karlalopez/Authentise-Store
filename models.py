@@ -254,6 +254,10 @@ def deactivate_model(id):
 def get_images_by_model_id(id):
     return Image.query.filter_by(model_id=id).all()
 
+def get_first_image_by_model_id(id):
+    return Image.query.filter_by(model_id=id).first()
+
+
 def add_images_to_model(path, model_id):
     image = Image(path, model_id)
 
@@ -444,28 +448,32 @@ def create_authentise_token(model,token):
 
 def get_token_print_status(authentise_token):
     #GET /api3/api_get_partner_print_status
-    url = "https://print.authentise.com/api3/api_get_partner_print_status?\
-    api_key={}&\
-    token={}".format(AUTHENTISE_KEY, authentise_token)
+    url = "https://print.authentise.com/api3/api_get_partner_print_status?api_key={}&token={}".format(AUTHENTISE_KEY, authentise_token)
     print url
 
     # Parse json output
     authentise_request = requests.get(url)
-    print authentise_request
     resp = json.loads(authentise_request.text)
     print resp
-    status = resp[u'printing_job_status']
+    if 'data' not in resp:
+        status = False
+    else:
+        if resp[u'data'][u'printing_job_status_name'] == 'SUCCESS':
+            print "success"
+            status = True
+        else:
+            status = False
 
-    # Print results
-    print "Token status: {}".format(status)
     return status
-#
-# def get_token_list_status(tokens):
-#     token_status = []
-#     for token in tokens:
-#         status = get_token_print_status(token.authentise_token)
-#         token_status.append(status)
-#     return token_status
+
+def get_token_list_status(tokens):
+    token_status = []
+    for token in tokens:
+        print token.authentise_token
+        status = get_token_print_status(token.authentise_token)
+        print "Token: {} Status: {}".format(token.authentise_token,status)
+        token_status.append(status)
+    return token_status
 
 
 
