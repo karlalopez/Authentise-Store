@@ -6,9 +6,9 @@ import datetime
 import json
 import logging
 import os
+import pprint
 import requests
 import time
-
 
 AUTHENTISE_KEY = os.environ['AUTHENTISE_API_KEY']
 LOGGER = logging.getLogger(__name__)
@@ -445,30 +445,23 @@ def create_authentise_token(model,token):
 
 
 def get_token_print_status(authentise_token):
-    #GET /api3/api_get_partner_print_status
-    url = "https://print.authentise.com/api3/api_get_partner_print_status?\
-    api_key={}&\
-    token={}".format(AUTHENTISE_KEY, authentise_token)
+    url = "https://print.authentise.com/api3/api_get_partner_print_status?api_key={}&token={}".format(AUTHENTISE_KEY, authentise_token)
     LOGGER.info(url)
 
     # Parse json output
-    authentise_request = requests.get(url)
-    print authentise_request
-    resp = json.loads(authentise_request.text)
-    print resp
-    status = resp[u'printing_job_status']
+    response = requests.get(url)
+    if not response.status_code == 200:
+        raise Exception("Failed to get token status: {}".format(response.text))
+    LOGGER.info("Got response %s %s", response.status_code, response.text)
+    data = response.json()
+    if not data['status']['code'] == 'ok':
+        raise Exception("Failed to get token status: {}".format(response.json()))
+    LOGGER.info("Parsed as %s", pprint.pformat(data))
+    status = data['data']['printing_job_status_name']
 
     # Print results
     LOGGER.info("Token status: %s", status)
     return status
-#
-# def get_token_list_status(tokens):
-#     token_status = []
-#     for token in tokens:
-#         status = get_token_print_status(token.authentise_token)
-#         token_status.append(status)
-#     return token_status
-
 
 
 if __name__ == "__main__":
