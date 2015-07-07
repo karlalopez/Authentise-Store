@@ -2,6 +2,7 @@ from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug import secure_filename
 import os
+import logging
 import stripe
 
 
@@ -37,4 +38,5 @@ db = SQLAlchemy(app)
 if __name__ == "__main__":
     from views import *
     del session
+    logging.basicConfig()
     app.run(debug=True)
