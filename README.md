@@ -21,7 +21,7 @@ Enter here your shop name and tagline
 shop_name = "Shop name"
 shop_tagline = "Best shop tagline ever"
 
-- On `models.py`, setup you Stripe and Authentise keys:
+- On `models.py`, setup your Stripe and Authentise keys:
 ```
 # SETUP: Enter here your STRIPE keys
 stripe_keys = {
@@ -30,11 +30,11 @@ stripe_keys = {
 }
 
 stripe.api_key = stripe_keys['secret_key']
-```
-```
+
 # SETUP: Enter here your AUTHENTISE key
 AUTHENTISE_KEY = os.environ['AUTHENTISE_API_KEY']
 ```
 
-
+- Tun `models.py` on Terminal, to create the database:
+```python models.py``` 
 
