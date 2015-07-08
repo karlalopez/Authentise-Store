@@ -27,9 +27,10 @@ stripe_keys = {
 }
 
 stripe.api_key = stripe_keys['secret_key']
-
+<code>
 # SETUP: Enter here your AUTHENTISE key
 AUTHENTISE_KEY = os.environ['AUTHENTISE_API_KEY']
+</code>
 
 - On `static/images` replace the file `cover.png` with the image background for your home. Ideally, it should be at least 1800 px wide.
 - 
