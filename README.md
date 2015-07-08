@@ -12,7 +12,7 @@ Directions
 - Fork this repo, and then clone it locally so that you have these files: https://help.github.com/articles/fork-a-repo/
 
 - Before you start, run the following code in your Terminal to install required dependencies:
-```sudo pip install -r requirements.txt``` 
+```$ sudo pip install -r requirements.txt``` 
 
 - On `static/images` replace the file `cover.png` with the image background for your home. Ideally, it should be at least 1800 px wide.
 
@@ -36,5 +36,5 @@ AUTHENTISE_KEY = os.environ['AUTHENTISE_API_KEY']
 ```
 
 - Tun `models.py` on Terminal, to create the database:
-```python models.py``` 
+```$ python models.py``` 
 
