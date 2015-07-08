@@ -11,14 +11,15 @@ Directions
 
 - Fork this repo, and then clone it locally so that you have these files: https://help.github.com/articles/fork-a-repo/
 
-- Before you start, run the following code: sudo pip install -r requirements.txt in your Terminal to install required dependencies
+- Before you start, run the following code in your Terminal to install required dependencies:
+```sudo pip install -r requirements.txt``` 
 
-- On app.py, setup your shop name and tagline:
+- On `app.py`, setup your shop name and tagline:
 # Enter here your shop name and tagline
 shop_name = "Shop name"
 shop_tagline = "Best shop tagline ever"
 
-- On models.py, setup you Stripe and Authentise keys:
+- On `models.py`, setup you Stripe and Authentise keys:
 # SETUP: Enter here your STRIPE keys
 stripe_keys = {
     'secret_key': os.environ['SECRET_KEY'],
@@ -30,7 +31,7 @@ stripe.api_key = stripe_keys['secret_key']
 # SETUP: Enter here your AUTHENTISE key
 AUTHENTISE_KEY = os.environ['AUTHENTISE_API_KEY']
 
-- On static/images replace the file cover.png with the image background for your home. Ideally, it should be at least 1800 px wide.
+- On `static/images` replace the file `cover.png` with the image background for your home. Ideally, it should be at least 1800 px wide.
 - 
 
 
