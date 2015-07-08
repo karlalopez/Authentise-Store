@@ -1,14 +1,15 @@
-from app import db, ALLOWED_EXTENSIONS
-import datetime
-import os
+from app import app, db, ALLOWED_EXTENSIONS
 from werkzeug import secure_filename
-from app import app
-import json
-import requests
+
 import argparse
+import datetime
+import json
+import logging
+import os
+import pprint
+import requests
 import time
 import stripe
-
 
 # SETUP: Enter here your STRIPE keys
 stripe_keys = {
@@ -214,13 +215,13 @@ def create_model(model_name, model_path, model_description, model_dimensions, mo
 
     try:
         db.session.add(model)
-        print "db.add"
+        LOGGER.info("db.add")
         db.session.commit()
-        print "db.commit"
+        LOGGER.info("db.commit")
         return model
     except Exception as e:
         db.session.rollback()
-        print e
+        LOGGER.info(e)
         return e
 
 def update_model(model, model_name, model_description, model_dimensions, model_collection, model_price):
@@ -239,20 +240,19 @@ def update_model(model, model_name, model_description, model_dimensions, model_c
         db.session.rollback()
 
 def update_model_popularity(model):
-    # Update the popularuty of a model
+    # Update the popularity of a model
     model.popularity += 1
     try:
         db.session.commit()
         return model
     except:
-        # If something went wrong, explicitly roll back the database
         db.session.rollback()
 
 def deactivate_model(id):
     # Deactivate a model
     model = Model.query.get(id)
     if model:
-        print "Model deactivation"
+        LOGGER.info("Model deactivation")
         model.active = False
         try:
             db.session.commit()
@@ -304,7 +304,7 @@ def save_images(model_to_create, model_image1, model_image2, model_image3, model
                 save_image = add_images_to_model(image_path, model_id)
             except Exception as e:
                 db.session.rollback()
-                print e
+                LOGGER.info(e)
                 return e
 
 def add_images_to_model(path, model_id):
@@ -328,8 +328,6 @@ def add_images_to_model(path, model_id):
 def get_collections():
     # Get all collections
     collections = Collection.query.filter_by(active='True').all()
-    for collection in collections:
-        print collection.name
     return collections
 
 def get_collection_name_by_id(id):
@@ -357,6 +355,7 @@ def create_collection(collection_name, collection_description):
 def update_collection(collection, collection_name, collection_description):
     # Update a collection
     collection.description = collection_description
+
     try:
         db.session.commit()
         return collection
@@ -409,7 +408,7 @@ def create_token(price_paid, model_id, user_email):
     try:
         db.session.add(token)
         db.session.commit()
-        print "db.commit"
+        return token
     except Exception as e:
         db.session.rollback()
         return e
@@ -470,7 +469,6 @@ def create_authentise_token(model,token):
 
     return authentise_token, authentise_token_link
 
-
 def get_token_print_status(authentise_token):
     # Check the status of a token
     url = "https://print.authentise.com/api3/api_get_partner_print_status?api_key={}&token={}".format(AUTHENTISE_KEY, authentise_token)
@@ -498,8 +496,7 @@ def get_token_list_status(tokens):
         status = get_token_print_status(token.authentise_token)
         token_status.append(status)
     return token_status
-
-
+    
 
 if __name__ == "__main__":
 

@@ -7,8 +7,6 @@ import os
 shop_name = "Shop name"
 shop_tagline = "Best shop tagline ever"
 
-
-
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join('static/uploads')
 MODELS_FOLDER = os.path.join('models')
@@ -29,4 +27,6 @@ db = SQLAlchemy(app)
 if __name__ == "__main__":
     from views import *
     del session
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.DEBUG)
     app.run(debug=True)
