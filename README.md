@@ -14,6 +14,8 @@ Directions
 - Before you start, run the following code in your Terminal to install required dependencies:
 ```sudo pip install -r requirements.txt``` 
 
+- On `static/images` replace the file `cover.png` with the image background for your home. Ideally, it should be at least 1800 px wide.
+
 - On `app.py`, setup your shop name and tagline:
 Enter here your shop name and tagline
 shop_name = "Shop name"
@@ -33,9 +35,6 @@ stripe.api_key = stripe_keys['secret_key']
 # SETUP: Enter here your AUTHENTISE key
 AUTHENTISE_KEY = os.environ['AUTHENTISE_API_KEY']
 ```
-
-- On `static/images` replace the file `cover.png` with the image background for your home. Ideally, it should be at least 1800 px wide.
-- 
 
 
 
