@@ -24,6 +24,7 @@
               <tr>
                 <td> Model</td>
                 <td> Status</td>
+                <td> Date </td>
               </tr>
               {% for token in tokens %}
               <tr>
@@ -35,6 +36,7 @@
                   <a href="/product/{{token.model.id}}" type="button" class="btn btn-default"> Buy! </a>
                   {% endif %}
                 </td>
+                <td>{{token.date_added}}</td>
               </tr>
               {% endfor %}
         </table>

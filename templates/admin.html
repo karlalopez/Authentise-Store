@@ -27,6 +27,7 @@
                     <tr>
                       <th>Price</th>
                       <th>Status</th>
+                      <th>Date</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -40,6 +41,7 @@
                           Expired
                         {% endif %}
                       </td>
+                      <td>{{token.date_added}}</td>
                     </tr>
                     {% endfor %}
                   </tbody>

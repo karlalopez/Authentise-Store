@@ -27,6 +27,4 @@ db = SQLAlchemy(app)
 if __name__ == "__main__":
     from views import *
     del session
-    logging.basicConfig()
-    logging.getLogger().setLevel(logging.DEBUG)
     app.run(debug=True)

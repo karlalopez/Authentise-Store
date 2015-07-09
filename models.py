@@ -1,17 +1,14 @@
 from app import app, db, ALLOWED_EXTENSIONS
 from werkzeug import secure_filename
 
-import argparse
+# import argparse
 import datetime
 import json
-import logging
 import os
-import pprint
 import requests
 import time
 import stripe
 
-# SETUP: Enter here your STRIPE keys
 stripe_keys = {
     'secret_key': os.environ['SECRET_KEY'],
     'publishable_key': os.environ['PUBLISHABLE_KEY']
@@ -19,8 +16,6 @@ stripe_keys = {
 
 stripe.api_key = stripe_keys['secret_key']
 
-
-# SETUP: Enter here your AUTHENTISE key
 AUTHENTISE_KEY = os.environ['AUTHENTISE_API_KEY']
 
 
@@ -219,11 +214,9 @@ def search_models(search):
     models = []
     for model in name_models:
         models.append(model)
-        print "append"
     for model in description_models:
         if model not in models:
             models.append(model)
-            print "append"
     return models
 
 def create_model(model_name, model_path, model_description, model_dimensions, model_collection, model_price):
@@ -289,7 +282,6 @@ def allowed_file(filename):
 def save_model(file):
     # Save the model on the server
     filename = "{}{}".format(todayiso,secure_filename(file.filename))
-    print filename
     file.save(os.path.join(app.config['MODELS_FOLDER'], filename))
     # Return the path to the model in the server
     model_path = "/{}/{}".format(app.config['MODELS_FOLDER'], filename)
@@ -331,13 +323,10 @@ def add_images_to_model(path, model_id):
 
     try:
         db.session.add(image)
-        print "db.add"
         db.session.commit()
-        print "db.commit"
         return image
     except Exception as e:
         db.session.rollback()
-        print e
         return e
 
 
@@ -400,22 +389,22 @@ def deactivate_collection(id):
 
 def get_tokens():
     # Get all tokens
-    tokens = Token.query.all()
+    tokens = Token.query.order_by(Token.date_added).all()
     return tokens
 
 def get_10_tokens():
     # Get latest 10 tokens created
-    tokens = Token.query.limit(10)
+    tokens = Token.query.order_by(Token.date_added).limit(10)
     return tokens
 
 def get_tokens_by_email(user_email):
     # Get tokens by user email
-    tokens = Token.query.filter_by(user_email=user_email).all()
+    tokens = Token.query.filter_by(user_email=user_email).order_by(Token.date_added).all()
     return tokens
 
 def get_token_by_id(id):
     # Get a token by id
-    token = Token.query.filter_by(id=id).first()
+    token = Token.query.filter_by(id=id).order_by(Token.date_added).first()
     return token
 
 def create_token(price_paid, model_id, user_email):
@@ -490,12 +479,10 @@ def create_authentise_token(model,token):
 def get_token_print_status(authentise_token):
     # Check the status of a token
     url = "https://print.authentise.com/api3/api_get_partner_print_status?api_key={}&token={}".format(AUTHENTISE_KEY, authentise_token)
-    print url
 
     # Parse json output
     authentise_request = requests.get(url)
     resp = json.loads(authentise_request.text)
-    print resp
     if 'data' not in resp:
         status = False
     else:
@@ -510,14 +497,12 @@ def get_token_list_status(tokens):
     # Check the status of list of tokens
     token_status = []
     for token in tokens:
-        print token.authentise_token
         status = get_token_print_status(token.authentise_token)
         token_status.append(status)
     return token_status
 
 
 if __name__ == "__main__":
-
     # Run this file directly to create the database tables.
     print "Creating database tables..."
     db.create_all()
