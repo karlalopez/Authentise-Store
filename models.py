@@ -197,16 +197,34 @@ def get_10_models():
     models = Model.query.filter_by(active='True').limit(10)
     return models
 
+def get_popular_models():
+    # Get models ordered by field
+    models = Model.query.order_by('popularity').all()
+    return models
 
 def get_models_by_collection(id):
     # Get model from a collection
     models = Model.query.filter_by(collection_id=id,active='True').all()
     return models
 
-
 def get_model_by_id(id):
     # Get model by id
     return Model.query.filter_by(id=id).first()
+
+def search_models(search):
+    # Search models
+    term = '%{}%'.format(search)
+    name_models = Model.query.filter(Model.name.match(term))
+    description_models = Model.query.filter(Model.description.match(term))
+    models = []
+    for model in name_models:
+        models.append(model)
+        print "append"
+    for model in description_models:
+        if model not in models:
+            models.append(model)
+            print "append"
+    return models
 
 def create_model(model_name, model_path, model_description, model_dimensions, model_collection, model_price):
     # Create a new model
@@ -496,7 +514,7 @@ def get_token_list_status(tokens):
         status = get_token_print_status(token.authentise_token)
         token_status.append(status)
     return token_status
-    
+
 
 if __name__ == "__main__":
 

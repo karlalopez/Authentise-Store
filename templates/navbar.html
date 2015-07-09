@@ -23,11 +23,15 @@
           <li><a href="/login">Login</a></li>
           {% endif %}
         </ul>
-        <form class="navbar-form navbar-right">
+        <form class="navbar-form navbar-right" action="/search" method="POST">
           <div class="form-group">
-            <form action="/search" method="POST" class="form-inline search">
-              <input  class="form-control" id="term" name="term" type="text" />
-              <input type="submit" value="Search" class="btn btn-defult"/>
+
+                <input  class="form-control" id="term" name="term" type="text" />
+
+            </div>
+
+            <input type="submit" value="Search" class="btn btn-defult"/>
+
             </form>
           </div>
         </form>

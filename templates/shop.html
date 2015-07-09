@@ -29,7 +29,7 @@
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <div class="page-header">
-            Order by: Price | Popularity
+            <a href="/shop/popularity">Most popular models</a> | <a href="/shop">All models</a>
           </div>
           <div class="row placeholders">
           {% for model in models %}
@@ -43,13 +43,21 @@
           <div class="row placeholders">
           {% endif %}
           {% endfor %}
+          {% if error %}
+          <div class="alert alert-danger" role="alert">
+
+            An error occurred:
+
+            {{ error }}
+
+          </div>
+          {% endif %}
           </div>
         </div>
-      </div>
+
     </div>
 
-
-
+    </div>
 
   </body>
 </html>

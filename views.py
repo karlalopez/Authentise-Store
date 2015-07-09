@@ -83,6 +83,42 @@ def shop():
         models = get_models()
         return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
+@app.route('/shop/popularity')
+def shop_pop():
+    # Lists the models by popularity
+    # Look for session
+    if session.get('email'):
+        print "Logged-in: Found session"
+        email = session['email']
+        collections = get_collections()
+        models = get_popular_models()
+        return render_template('shop.html', email=email, models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+    else:
+        # If no session, render shop anyway
+        collections = get_collections()
+        models = get_popular_models()
+        return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+
+@app.route('/search', methods=['POST'])
+def search():
+    # Look for session
+    if session.get('email'):
+        print "Logged-in: Found session"
+        email = session['email']
+        collections = get_collections()
+        search = request.form.get('term')
+        models = search_models(search)
+        if models == []:
+            return render_template('shop.html', error="Sorry, no matched to your search.", email=email, models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+        return render_template('shop.html', email=email, models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+    else:
+        # If no session, render shop anyway
+        search = request.form.get('term')
+        collections = get_collections()
+        models = search_models(search)
+        return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+
+
 @app.route('/collection/<id>')
 def collection(id):
     # Look for session
