@@ -37,4 +37,88 @@ shop_tagline = "Best shop tagline ever"
 - Run `models.py` on Terminal, to create the database:
 ```$ python models.py``` 
 
+- Push  your changes to your repo:
+```
+$ git commit -a -m "My custom store"
+$ git push
+```
+
+# Deploying it 
+
+- First, create a Heroku account: https://signup.heroku.com/
+
+- Install the Heroku Toolbelt: https://toolbelt.heroku.com/
+
+- Login to Heroku on Terminal:
+```
+$ heroku login
+Enter your Heroku credentials.
+Email: your@email.com
+Password:
+Authentication successful.
+```
+- Install the Python package gunicorn
+```
+$ pip install gunicorn
+```
+- Now you are going to create a 'Procfile' with the following content 'web: gunicorn app:app --log-file=-'. If you know how to do it, good. If you don't, here's a suggestion: 
+```
+vim Procfile
+```
+
+You should be in the VIM editor now. Press the key 'i' in your keyboard. 
+
+Paste or type the followin line:
+```
+web: gunicorn app:app --log-file=-
+```
+
+Press the key 'ESC' on your keyboard.
+
+Type ':w' and then ':q'
+
+To make sure it's done, display the file content doing:
+```
+$ cat Procfile
+```
+Check this works with 'foreman':
+
+```
+$ foreman start
+```
+
+- If everything is fine, add 'Procfile' to the git repo.
+```
+$ git add Procfile
+$ git commit -m "Getting ready for Heroku"
+```
+
+- You are ready to create a new Heroku app. This creates a new app and sets up the Git remote heroku for you to push code to.
+```
+$ heroku create
+```
+- To deploy, push the code via Git:
+```
+$ git push heroku
+```
+- Wwhen the deploy is done, you should see the URL of your new Heroku app:
+```
+remote: -----> Discovering process types
+remote:        Procfile declares types -> web
+remote:
+remote: -----> Compressing... done, 37.2MB
+remote: -----> Launching... done, v3
+remote:        https://desolate-beyond-5764.herokuapp.com/ deployed to Heroku
+remote:
+remote: Verifying deploy.... done.
+To https://git.heroku.com/desolate-beyond-5764.git
+```
+You can then visit that URL in your browser.
+
+- You can rename your app to customize your URL:
+```
+$ heroku rename my_store_name
+```
+Now your URL will be 'http://my_store_name.herokuapp.com'.
+
 
