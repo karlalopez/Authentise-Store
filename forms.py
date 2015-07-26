@@ -8,3 +8,7 @@ class UserForm(Form):
     ])
     confirm = PasswordField('Confirm Password')
 
+
+class LoginForm(Form):
+    email = StringField('Email Address', [validators.Length(min=6, max=35)])
+    password = PasswordField('Password')

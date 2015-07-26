@@ -9,7 +9,7 @@ from werkzeug import secure_filename
 def index():
     return render_template('index.html', shop_name=shop_name, shop_tagline=shop_tagline)
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     # Look for session
     if session.get('email'):
@@ -18,7 +18,21 @@ def login():
         return redirect('/shop')
     else:
         # Render login
-        return render_template('/login.html', shop_name=shop_name, shop_tagline=shop_tagline)
+        form = LoginForm(request.form)
+        if request.method == 'POST' and form.validate():
+            print "validated"
+            # Check for username
+            user_login = get_user_by_email(form.email.data)
+            if user_login:
+                print "user found"
+                # Check for password
+                if user_login.password == form.password.data:
+                    print "pass found"
+                    session['email'] = form.email.data
+                    return redirect('/shop')
+            return render_template('login.html', error="Login credentials don't not work", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+        return render_template('login.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+
 
 @app.route('/submit-login', methods=['POST'])
 def submit_login():
