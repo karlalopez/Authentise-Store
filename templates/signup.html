@@ -16,27 +16,23 @@
             </div>
         {% endif %}
 
-
-        <form class="form-signin" action="/submit-signup" method="POST">
+        <form class="form-signin" method="POST" action="/signup">
           <h2 class="form-signin-heading">Please sign up</h2>
-
+          <p>
           <label for="email" class="sr-only">Email address</label>
-          <input type="email" id="email" name="email_field" class="form-control" placeholder="Email address" required autofocus>
+          {{ form.email(class="form-control", placeholder="Email address", required="true") }}
+          </p>
           <p>
           <label for="password" class="sr-only">Password</label>
-          <input type="password" id="pass1" name="password_field" class="form-control" placeholder="Password" required>
-
+          {{ form.password(class="form-control", id="pass1", placeholder="Password", required="true") }}
+          <p>
           <label for="pass2" class="sr-only">Confirm password</label>
-          <input type="password" id="pass2" name="retype_password" class="form-control" placeholder="Password" required onkeyup="checkPass(); return false;">
+          {{ form.confirm(class="form-control", id="pass2", placeholder="Confirm Password", onkeyup="checkPass(); return false;", required="true") }}
           <p><span id="confirmMessage" class="confirmMessage"></span></p>
 
-          <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+          <p><button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
           Or <a href="login">Login</a>.
-
         </form>
-
-
-
 
   </div>
 

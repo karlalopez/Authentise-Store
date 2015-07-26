@@ -1,7 +1,9 @@
 from flask import render_template, request, redirect, session, jsonify, url_for
 from models import *
 from app import *
+from forms import *
 from werkzeug import secure_filename
+
 
 @app.route('/')
 def index():
@@ -41,7 +43,7 @@ def logout():
         del session['email']
     return redirect('/shop')
 
-@app.route('/signup')
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
     # Look for session
     if session.get('email'):
@@ -49,24 +51,19 @@ def signup():
         email = session['email']
         return redirect('/shop')
     else:
-        return render_template('signup.html', shop_name=shop_name, shop_tagline=shop_tagline)
-
-@app.route('/submit-signup', methods=['POST'])
-def submit_signup():
-    user_email = request.form.get('email_field')
-    user_password = request.form.get('password_field')
-
-    # Check for duplicated username
-    if get_user_by_email(user_email):
-        return render_template('signup.html', shop_name=shop_name, shop_tagline=shop_tagline, error="Email already taken")
-    # If no duplicates, create user
-    else:
-        try:
-            user = create_user(user_email, user_password)
-            session['email'] = user_email
-            return redirect('/shop')
-        except Exception as e:
-            return render_template('signup.html', shop_name=shop_name, shop_tagline=shop_tagline, error=e.message)
+        form = UserForm(request.form)
+        if request.method == 'POST' and form.validate():
+            # Check for duplicated username
+            if get_user_by_email(form.email.data):
+                return render_template('signup.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline, error="Email already taken")
+            # If no duplicates, create user
+            else:
+                try:
+                    user = create_user(form.email.data, form.password.data)
+                    return redirect(url_for('login'))
+                except Exception as e:
+                    return render_template('signup.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline, error=e.message)
+        return render_template('signup.html', shop_name=shop_name, shop_tagline=shop_tagline,form=form)
 
 @app.route('/shop')
 def shop():
@@ -242,14 +239,13 @@ def profile():
         print "Logged-in: Found session"
         email = session['email']
         user = get_user_by_email(email)
-        if user.admin == True:
-            # Get all orders from this user
-            tokens = get_tokens_by_email(email)
-            token_status = []
-            for token in tokens:
-                s = get_token_print_status(token.authentise_token)
-                token_status.append(s)
-            return render_template('profile.html', tokens=tokens, token_status=token_status, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+        # Get all orders from this user
+        tokens = get_tokens_by_email(email)
+        token_status = []
+        for token in tokens:
+            s = get_token_print_status(token.authentise_token)
+            token_status.append(s)
+        return render_template('profile.html', tokens=tokens, token_status=token_status, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/login')
 
 # Admin routes

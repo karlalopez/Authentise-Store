@@ -1,5 +1,6 @@
 from app import app, db, ALLOWED_EXTENSIONS
 from werkzeug import secure_filename
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 # import argparse
 import datetime
@@ -179,6 +180,7 @@ def delete_user(id):
             return "Something went wrong"
     else:
             return "User not found"
+
 
 # Model related functions
 
