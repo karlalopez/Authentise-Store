@@ -3,7 +3,16 @@ from models import *
 from app import *
 from forms import *
 from werkzeug import secure_filename
+from flask.ext.login import login_user, logout_user, login_required, LoginManager, current_user
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view =  "signin"
+LOGIN_URL = '/login'
+
+@login_manager.user_loader
+def load_user(userid):
+    return User.query.filter(User.id==userid).first()
 
 @app.route('/')
 def index():
@@ -11,58 +20,32 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # Look for session
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        return redirect('/shop')
-    else:
-        # Render login
-        form = LoginForm(request.form)
-        if request.method == 'POST' and form.validate():
-            print "validated"
-            # Check for username
-            user_login = get_user_by_email(form.email.data)
-            if user_login:
-                print "user found"
-                # Check for password
-                if user_login.password == form.password.data:
-                    print "pass found"
-                    session['email'] = form.email.data
-                    return redirect('/shop')
-            return render_template('login.html', error="Login credentials don't not work", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
-        return render_template('login.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
+        print "form validated"
+        # Check for username
+        user_login = get_user_by_email(form.email.data)
+        if user_login:
+            print "user found"
+            # Check for password
+            if user_login.password == form.password.data:
+                print "pass found"
+                login_user(user_login)
+                return redirect('/shop')
+        return render_template('login.html', error="Login credentials don't not work", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+    return render_template('login.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline)
 
-
-@app.route('/submit-login', methods=['POST'])
-def submit_login():
-    user_email = request.form.get('email_field')
-    user_password = request.form.get('password_field')
-
-    # Check for username
-    user_login = get_user_by_email(user_email)
-    if user_login:
-        # Check for password
-        if user_login.password == user_password:
-            session['email'] = user_email
-            return redirect('/shop')
-    return render_template('login.html', error="Login credentials don't not work", shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/logout')
 def logout():
-    # Look for session
-    if session.get('email'):
-        email = session['email']
-        # End session
-        del session['email']
+    if current_user.is_authenticated():
+        logout_user()
     return redirect('/shop')
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     # Look for session
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
+    if current_user.is_authenticated():
         return redirect('/shop')
     else:
         form = UserForm(request.form)
@@ -81,93 +64,44 @@ def signup():
 
 @app.route('/shop')
 def shop():
-    # Look for session
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        collections = get_collections()
-        models = get_models()
-        return render_template('shop.html', email=email, models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
-    else:
-        # If no session, render shop anyway
-        collections = get_collections()
-        models = get_models()
-        return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+    collections = get_collections()
+    models = get_models()
+    return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/shop/popularity')
 def shop_pop():
     # Lists the models by popularity
-    # Look for session
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        collections = get_collections()
-        models = get_popular_models()
-        return render_template('shop.html', email=email, models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
-    else:
-        # If no session, render shop anyway
-        collections = get_collections()
-        models = get_popular_models()
-        return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+    collections = get_collections()
+    models = get_popular_models()
+    return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/search', methods=['POST'])
 def search():
-    # Look for session
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        collections = get_collections()
-        search = request.form.get('term')
-        models = search_models(search)
-        if models == []:
-            return render_template('shop.html', error="Sorry, no matched to your search.", email=email, models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
-        return render_template('shop.html', email=email, models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
-    else:
-        # If no session, render shop anyway
-        search = request.form.get('term')
-        collections = get_collections()
-        models = search_models(search)
-        return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
-
+    collections = get_collections()
+    search = request.form.get('term')
+    models = search_models(search)
+    if models == []:
+        return render_template('shop.html', error="Sorry, no matched to your search.", email=email, models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+    return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/collection/<id>')
 def collection(id):
-    # Look for session
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        collections = get_collections()
-        models = get_models_by_collection(id)
-        collection_name = get_collection_name_by_id(id)
-        return render_template('shop.html', email=email, models=models, collections=collections, collection_name=collection_name)
-    else:
-        # If no session, render shop anyway
-        collections = get_collections()
-        models = get_models_by_collection(id)
-        collection_id = id
-        return render_template('shop.html', models=models, collections=collections, collection_id=collection_id)
+    collections = get_collections()
+    models = get_models_by_collection(id)
+    collection_name = get_collection_name_by_id(id)
+    return render_template('shop.html', email=email, models=models, collections=collections, collection_name=collection_name)
 
 @app.route('/product/<id>')
 def product(id):
-    # Look for session
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        model = get_model_by_id(id)
-        if model:
-            images = get_images_by_model_id(id)
-            error = " "
-        else:
-            error = "Model does not exist."
-            images = " "
-        collections = get_collections()
-        return render_template('product.html', error=error, email=email, model=model, images=images, collections=collections, key=stripe_keys['publishable_key'], shop_name=shop_name, shop_tagline=shop_tagline)
-    else:
-        # If no session, render product anyway
-        model = get_model_by_id(id)
+    model = get_model_by_id(id)
+    if model:
         images = get_images_by_model_id(id)
-        collections = get_collections()
-        return render_template('product.html', model=model, images=images, collections=collections, key=stripe_keys['publishable_key'],shop_name=shop_name, shop_tagline=shop_tagline)
+        error = " "
+    else:
+        error = "Model does not exist."
+        images = " "
+    collections = get_collections()
+    return render_template('product.html', error=error, model=model, images=images, collections=collections, key=stripe_keys['publishable_key'], shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/models')
 def models():
@@ -177,10 +111,8 @@ def models():
 
 @app.route('/checkout/<id>', methods=['POST'])
 def checkout(id):
-    # Look for session
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
+    # Checks if the user is authenticated
+    if current_user.is_authenticated():
         model = get_model_by_id(id)
         collections = get_collections()
         amount = int(model.price * 100)
@@ -222,15 +154,13 @@ def checkout(id):
             return render_template('product.html', email=email, model=model, collections=collections, error=error, shop_name=shop_name, shop_tagline=shop_tagline)
 
     else:
-        # If no session, render login
+        # If user is not authenticated, render login
         return render_template('login.html')
 
 @app.route('/print/<id>')
 def print_order(id):
-    # Look for session
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
+    # Checks if the user is authenticated
+    if current_user.is_authenticated():
         # Get order info
         token = get_token_by_id(id)
         image = get_first_image_by_model_id(token.model_id)
@@ -240,43 +170,39 @@ def print_order(id):
         # Form the Authentise token link
         authentise_link = "http://app.authentise.com/#/widget/{}".format(token.authentise_token)
 
-        return render_template('checkout.html', image_path=image_path, token=token, authentise_link=authentise_link, email=email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
-
+        return render_template('checkout.html', image_path=image_path, token=token, authentise_link=authentise_link, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+    # If user is not authenticated, render login
     else:
         return render_template('login.html')
 
 
 @app.route('/profile')
 def profile():
-    # Look for session
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated
+    if current_user.is_authenticated():
         # Get all orders from this user
-        tokens = get_tokens_by_email(email)
+        tokens = get_tokens_by_email(current_user.email)
         token_status = []
         for token in tokens:
             s = get_token_print_status(token.authentise_token)
             token_status.append(s)
-        return render_template('profile.html', tokens=tokens, token_status=token_status, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+        return render_template('profile.html', tokens=tokens, token_status=token_status, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/login')
 
 # Admin routes
 
 @app.route('/admin')
 def admin():
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             models = get_10_models()
             tokens = get_10_tokens()
             token_status = get_token_list_status(tokens)
             users = get_10_users()
-            return render_template('admin.html', models=models, tokens=tokens, token_status=token_status, users=users, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+            return render_template('admin.html', models=models, tokens=tokens, token_status=token_status, users=users, shop_name=shop_name, shop_tagline=shop_tagline)
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 
@@ -284,26 +210,22 @@ def admin():
 
 @app.route('/admin-models')
 def adminmodels():
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
-        models = get_models()
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             models = get_10_models()
             tokens = get_10_tokens()
             users = get_10_users()
-            return render_template('admin-models.html', models=models, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+            return render_template('admin-models.html', models=models, shop_name=shop_name, shop_tagline=shop_tagline)
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 @app.route('/admin-models/<id>', methods=['GET', 'POST'])
 def adminmodels_view(id):
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             model = get_model_by_id(id)
             images = get_images_by_model_id(id)
@@ -323,17 +245,14 @@ def adminmodels_view(id):
                 return redirect('admin-models')
             except Exception as e:
                 return render_template('view-model.html', error=e.message, email=email, model=model, collections=collections, images=images, shop_name=shop_name, shop_tagline=shop_tagline)
-
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 @app.route('/admin-models/new', methods=['GET', 'POST'])
 def adminmodels_new():
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
-        collections = get_collections()
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             # If GET render template to add new model
             if request.method == 'GET':
@@ -358,15 +277,14 @@ def adminmodels_new():
             except Exception as e:
                 return render_template('new-model.html', error=e.message, email=email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
+    # If not authenticated and admin, redirects to shop
     return redirect('/admin-models')
 
 @app.route('/admin-models/deactivate/<id>', methods=['GET', 'POST'])
 def adminmodels_deactivate(id):
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             # Make sure the model exists
             model_to_deactivate = get_model_by_id(id)
@@ -374,29 +292,27 @@ def adminmodels_deactivate(id):
             if model_to_deactivate:
                 deactivate_model(model_to_deactivate.id)
                 return redirect('admin-models')
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 # Collections route
 
 @app.route('/admin-collections')
 def admincollections():
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             collections = get_collections()
             return render_template('admin-collections.html', email=email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 @app.route('/admin-collections/<id>', methods=['GET', 'POST'])
 def admincollections_view(id):
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             collection = get_collection_by_id(id)
             if request.method == 'GET':
@@ -411,20 +327,18 @@ def admincollections_view(id):
                 return redirect('admin-collections')
             except Exception as e:
                 return render_template('view-collection.html', error=e.message, email=email, collection=collection, shop_name=shop_name, shop_tagline=shop_tagline)
-
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 @app.route('/admin-collections/new', methods=['GET', 'POST'])
 def admincollections_new():
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             # If GET, render the template to add new collections
             if request.method == 'GET':
-                return render_template('new-collection.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+                return render_template('new-collection.html', shop_name=shop_name, shop_tagline=shop_tagline)
 
             # If POST, use the info to update model
             collection_name = request.form.get('collection_name_field')
@@ -434,17 +348,16 @@ def admincollections_new():
                 # Update collection
                 collection_to_create = create_collection(collection_name, collection_description)
             except Exception as e:
-                return render_template('new-collection.html', error=e.message, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+                return render_template('new-collection.html', error=e.message, shop_name=shop_name, shop_tagline=shop_tagline)
+    # If not authenticated and admin, redirects to shop
     return redirect('/admin-collections')
 
 
 @app.route('/admin-collections/deactivate/<id>', methods=['GET', 'POST'])
 def admincollections_deactivate(id):
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             collection_to_deactivate = get_collection_by_id(id)
             # Make sure the collection exists
@@ -453,37 +366,36 @@ def admincollections_deactivate(id):
                 deactivate_collection(collection_to_deactivate.id)
                 return redirect('admin-collections')
             return redirect('admin-collections')
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 # Orders route
 
 @app.route('/admin-orders')
 def adminorders():
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             tokens = get_tokens()
             token_status = get_token_list_status(tokens)
-            return render_template('admin-orders.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline, tokens=tokens, token_status=token_status)
+            return render_template('admin-orders.html', shop_name=shop_name, shop_tagline=shop_tagline, tokens=tokens, token_status=token_status)
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 # Please note there is no route to add new, edit or deactivate order, as they are automaticly created using Stripe and Authentise
 
 @app.route('/admin-order/<id>')
 def adminorder_view(id):
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             # Render template with order info
             token = get_token_by_id(id)
             token_status = get_token_print_status(token.authentise_token)
             return render_template('view-order.html', email=email, token=token, token_status=token_status, shop_name=shop_name, shop_tagline=shop_tagline)
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 
@@ -491,23 +403,20 @@ def adminorder_view(id):
 
 @app.route('/admin-users')
 def adminusers():
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             users = get_users()
             return render_template('admin-users.html', email=email, users=users, shop_name=shop_name, shop_tagline=shop_tagline)
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 @app.route('/admin-users/<id>', methods=['GET', 'POST'])
 def adminusers_view(id):
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             # If GET, render template with user info
             if request.method == 'GET':
@@ -522,21 +431,19 @@ def adminusers_view(id):
                 user_to_update = update_user(user_to_update, user_email, user_admin)
                 return redirect('admin-users')
             except Exception as e:
-                return render_template('view-user.html', error=e.message, user=user, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
-
+                return render_template('view-user.html', error=e.message, user=user, shop_name=shop_name, shop_tagline=shop_tagline)
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 @app.route('/admin-users/new', methods=['GET', 'POST'])
 def adminusers_new():
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         if user.admin == True:
             # If GET, render template to create new user
             if request.method == 'GET':
-                return render_template('new-user.html', email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+                return render_template('new-user.html', shop_name=shop_name, shop_tagline=shop_tagline)
             # If POST, use the info to create new user
             user_email = request.form.get('user_email_field')
             user_password = request.form.get('user_password_field')
@@ -545,7 +452,8 @@ def adminusers_new():
                 user = create_user(user_email, user_password)
                 return redirect('admin-users')
             except Exception as e:
-                return render_template('new-user.html', error=e.message, email=email, shop_name=shop_name, shop_tagline=shop_tagline)
+                return render_template('new-user.html', error=e.message, shop_name=shop_name, shop_tagline=shop_tagline)
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
 
@@ -553,11 +461,9 @@ def adminusers_new():
 
 @app.route('/admin-users/delete/<id>', methods=['GET', 'POST'])
 def adminusers_delete(id):
-    # Look for session and admin rights
-    if session.get('email'):
-        print "Logged-in: Found session"
-        email = session['email']
-        user = get_user_by_email(email)
+    # Checks if the user is authenticated & admin
+    if current_user.is_authenticated():
+        user = get_user_by_email(current_user.email)
         # Make sure the user exists
         if user.admin == True:
             # Delete user
@@ -565,4 +471,5 @@ def adminusers_delete(id):
             if user_to_delete:
                 delete_user(user_to_delete.id)
                 return redirect('admin-users')
+    # If not authenticated and admin, redirects to shop
     return redirect('/shop')

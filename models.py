@@ -1,6 +1,9 @@
 from app import app, db, ALLOWED_EXTENSIONS
+from flask.ext.bcrypt import Bcrypt
 from werkzeug import secure_filename
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from sqlalchemy.ext.hybrid import hybrid_property
+from flask.ext.login import UserMixin
 
 # import argparse
 import datetime
@@ -9,6 +12,9 @@ import os
 import requests
 import time
 import stripe
+
+bcrypt = Bcrypt(app)
+BCRYPT_LOG_ROUNDS = 12
 
 stripe_keys = {
     'secret_key': os.environ['SECRET_KEY'],
@@ -94,12 +100,12 @@ class Token(db.Model):
         self.model_id = model_id
         self.user_email = user_email
 
-class User(db.Model):
+class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100),unique=True)
     date_added = db.Column(db.Date)
-    password = db.Column(db.String(100))
+    _password = db.Column(db.String(100))
     admin = db.Column(db.Boolean)
 
     def __init__(self, email, date_added, password, admin):
@@ -107,6 +113,36 @@ class User(db.Model):
         self.date_added = today
         self.password = password
         self.admin = admin
+
+    @hybrid_property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def _set_password(self, plaintext):
+        self._password = bcrypt.generate_password_hash(plaintext)
+
+    # def is_correct_password(self, plaintext):
+    #     return bcrypt.check_password_hash(self._password, plaintext)
+
+    # def is_active(self):
+    #     return True
+
+    # @property
+    # def is_authenticated(self):
+    #     return True
+
+    # @property
+    # def is_anonymous(self):
+    #     return False
+
+    # def get_id(self):
+    #     try:
+    #         return unicode(self.id)
+    #     except AttributeError:
+    #         raise NotImplementedError('No `id` attribute - override `get_id`')
+
+
 
 
 # User related functions

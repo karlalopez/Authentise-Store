@@ -16,7 +16,7 @@
           <li class="active"><a href="/shop">Home</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          {% if email %}
+          {% if current_user.is_authenticated() %}
           <li><a href="/logout">Logout</a></li>
           <li><a href="/profile">Profile</a></li>
           {% else %}
