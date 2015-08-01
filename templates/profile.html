@@ -4,16 +4,47 @@
 {% include 'navbar.html' %}
 
 <div class="container">
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+
+        A problem ocurred with your password change:
+
+        {{ error }}
+
+        </div>
+    {% endif %}
+
+    {% if message %}
+        <div class="alert alert-success" role="alert">
+
+        {{ message }}
+
+        </div>
+    {% endif %}
+
+
   <div class="starter-template">
-    <h3>Change password </h3>
-    <form class="form-signin" action="change-password" method="POST" >
+    <form class="form-signin" method="POST" action="/profile">
+      <h2 class="form-signin-heading">Change password</h2>
+
+      <label for="old_password" class="sr-only">Old Password</label>
+      {{ form.old_password(class="form-control", id="pass", placeholder="Old password", required="true") }}
+      <p>
+      <label for="new_password" class="sr-only">Password</label>
+      {{ form.new_password(class="form-control", id="pass1", placeholder="New password", required="true") }}
+      <p>
+      <label for="confirm" class="sr-only">Confirm new password</label>
+      {{ form.confirm(class="form-control", id="pass2", placeholder="Confirm new password", onkeyup="checkPass(); return false;", required="true") }}
+      <p><span id="confirmMessage" class="confirmMessage"></span></p>
+
+<!-- 
 
       <p>Old Password: <input type="password" name="old_password" class="form-control" required></p>
 
       <p>New Password: <input type="password" id="pass1" name="new_password" class="form-control" required></p>
 
       <p>Re-type new Password:<input type="password" id="pass2" name="retype_password" required class="form-control" onkeyup="checkPass(); return false;"></p>
-      <p><span id="confirmMessage" class="confirmMessage"></span></p>
+      <p><span id="confirmMessage" class="confirmMessage"></span></p> -->
 
       <p><input type="submit" value="Change password" class="btn btn-primary"></i></p>
   </div>

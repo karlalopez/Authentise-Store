@@ -171,7 +171,7 @@ def print_order(id):
         return render_template('login.html')
 
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
     # Checks if the user is authenticated
     if current_user.is_authenticated():
@@ -181,8 +181,26 @@ def profile():
         for token in tokens:
             s = get_token_print_status(token.authentise_token)
             token_status.append(s)
-        return render_template('profile.html', tokens=tokens, token_status=token_status, shop_name=shop_name, shop_tagline=shop_tagline)
+        # Loads the password change form    
+        form = ChangePasswordForm(request.form)
+
+        # If password change has been posted
+        if request.method == 'POST' and form.validate():
+            user = get_user_by_email(current_user.email)
+            # Validates old password
+            if user.is_correct_password(form.old_password.data):
+                # Changes user password to new_password
+                try:
+                    change_user_password(current_user, form.new_password.data)
+                    return render_template('profile.html', form=form, tokens=tokens, token_status=token_status, shop_name=shop_name, shop_tagline=shop_tagline, message="Your password has been changed successfuly.")
+                except Exception as e:
+                    return render_template('profile.html', form=form, tokens=tokens, token_status=token_status, shop_name=shop_name, shop_tagline=shop_tagline, error=e.message)
+            else:
+                return render_template('profile.html', form=form, tokens=tokens, token_status=token_status, shop_name=shop_name, shop_tagline=shop_tagline, error="Password does not match")
+        else:
+            return render_template('profile.html', form=form, tokens=tokens, token_status=token_status, shop_name=shop_name, shop_tagline=shop_tagline)
     return redirect('/login')
+
 
 # Admin routes
 

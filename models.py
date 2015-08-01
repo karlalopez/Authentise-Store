@@ -168,13 +168,21 @@ def create_user(email, password):
 def update_user(user, user_email, user_admin):
     # Update user info
     if user_email is None or user_email == '':
-        raise Exception("User needs a valid email")
-
+        raise Exception("Invalid user email")
     user.email = user_email
     user.admin = user_admin
     try:
         db.session.commit()
         return user
+    except:
+        # If something went wrong, explicitly roll back the database
+        db.session.rollback()
+
+def change_user_password(user, user_password):
+    # Changes user password
+    user.password = user_password
+    try:
+        db.session.commit()
     except:
         # If something went wrong, explicitly roll back the database
         db.session.rollback()
