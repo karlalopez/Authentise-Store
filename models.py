@@ -122,27 +122,8 @@ class User(db.Model, UserMixin):
     def _set_password(self, plaintext):
         self._password = bcrypt.generate_password_hash(plaintext)
 
-    # def is_correct_password(self, plaintext):
-    #     return bcrypt.check_password_hash(self._password, plaintext)
-
-    # def is_active(self):
-    #     return True
-
-    # @property
-    # def is_authenticated(self):
-    #     return True
-
-    # @property
-    # def is_anonymous(self):
-    #     return False
-
-    # def get_id(self):
-    #     try:
-    #         return unicode(self.id)
-    #     except AttributeError:
-    #         raise NotImplementedError('No `id` attribute - override `get_id`')
-
-
+    def is_correct_password(self, plaintext):
+        return bcrypt.check_password_hash(self._password, plaintext)
 
 
 # User related functions

@@ -7,8 +7,8 @@ from flask.ext.login import login_user, logout_user, login_required, LoginManage
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view =  "signin"
-LOGIN_URL = '/login'
+# login_manager.login_view =  "signin"
+# LOGIN_URL = '/login'
 
 @login_manager.user_loader
 def load_user(userid):
@@ -22,17 +22,12 @@ def index():
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
-        print "form validated"
-        # Check for username
-        user_login = get_user_by_email(form.email.data)
-        if user_login:
-            print "user found"
-            # Check for password
-            if user_login.password == form.password.data:
-                print "pass found"
-                login_user(user_login)
-                return redirect('/shop')
-        return render_template('login.html', error="Login credentials don't not work", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+        user = get_user_by_email(form.email.data)
+        if user.is_correct_password(form.password.data):
+            login_user(user)
+            return redirect('/shop')
+        else:
+            return render_template('login.html', error="Login credentials don't not work", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
     return render_template('login.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline)
 
 
