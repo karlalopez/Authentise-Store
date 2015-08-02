@@ -5,6 +5,12 @@ First, get it ready to run locally:
 
 - Signup for Stripe.com. Go to Your account >> Account Settings >> API Keys. You will need this keys soon.
 
+- Sign up for Mailgun free account at https://mailgun.com. You’ll need a few pieces of information from the Mailgun control panel before moving forward:
+
+1. API Key
+2. Sandbox Domain URL
+Both of these pieces of information can be found on the landing page of the Mailgun control panel.
+
 - Contact Authentise to get an API key for the Design Streaming service. 
 
 - Install Postgres: 
@@ -30,6 +36,12 @@ $ export PUBLISHABLE_KEY=your_stripe_test_publishable_key
 ```
 ```
 $ export AUTHENTISE_API_KEY=your_authentise_key
+```
+```
+$ export MAILGUN_API_KEY=your_mailgun_api_key
+```
+```
+$ export MAILGUN_SANDBOX_DOMAIN_URL=your_mailgun_sandbox_domain_url
 ```
 
 - On `static/images` replace the file `cover.png` with the image background for your home. Ideally, it should be at least 1800 px wide.
