@@ -5,10 +5,9 @@ from forms import *
 from werkzeug import secure_filename
 from flask.ext.login import login_user, logout_user, login_required, LoginManager, current_user
 
+
 login_manager = LoginManager()
 login_manager.init_app(app)
-# login_manager.login_view =  "signin"
-# LOGIN_URL = '/login'
 
 @login_manager.user_loader
 def load_user(userid):
@@ -52,10 +51,44 @@ def signup():
             else:
                 try:
                     user = create_user(form.email.data, form.password.data)
-                    return redirect(url_for('login'))
                 except Exception as e:
                     return render_template('signup.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline, error=e.message)
+
+            # Now we'll send the email confirmation link
+            subject = "{} - Please confirm your email".format(shop_name)
+
+            token = ts.dumps(form.email.data, salt='email-confirm-key')
+
+            confirm_url = url_for(
+                'confirm_email',
+                token=token,
+                _external=True)
+
+            html = render_template('email-confirmation.html', confirm_url=confirm_url, shop_name=shop_name, shop_tagline=shop_tagline)
+
+            # Send email confirmation
+            send_confirmation_to_user(form.email.data, subject, html, shop_name)
+
+            return render_template('login.html', message="Your user has been created. Please log in here, and don't forget to check your email to confirm your account.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
         return render_template('signup.html', shop_name=shop_name, shop_tagline=shop_tagline,form=form)
+
+@app.route('/confirm/<token>')
+def confirm_email(token):
+    if token == "signup":
+        return redirect('/login')
+
+    form = LoginForm(request.form)
+    try:
+        email = ts.loads(token, salt="email-confirm-key", max_age=86400)
+    except:
+        return render_template('login.html', error="Your user could not be confirmed. Please contact us.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+
+    confirmation = confirm_user(email)
+
+    if confirmation:
+        return render_template('login.html', message="Your user is now confirmed. Thanks! Please login in here.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+    else:
+        return render_template('login.html', error="Your user could not be confirmed. Please contact us.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/shop')
 def shop():

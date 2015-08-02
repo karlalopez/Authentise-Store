@@ -17,13 +17,17 @@ bcrypt = Bcrypt(app)
 BCRYPT_LOG_ROUNDS = 12
 
 stripe_keys = {
-    'secret_key': os.environ['SECRET_KEY'],
-    'publishable_key': os.environ['PUBLISHABLE_KEY']
+    'secret_key': os.environ['STRIPE_SECRET_KEY'],
+    'publishable_key': os.environ['STRIPE_PUBLISHABLE_KEY']
 }
 
 stripe.api_key = stripe_keys['secret_key']
 
 AUTHENTISE_KEY = os.environ['AUTHENTISE_API_KEY']
+
+MAILGUN_API_KEY = os.environ['MAILGUN_API_KEY']
+
+MAILGUN_SANDBOX_DOMAIN_URL = os.environ['MAILGUN_SANDBOX_DOMAIN_URL']
 
 
 today = datetime.datetime.today()
@@ -107,12 +111,14 @@ class User(db.Model, UserMixin):
     date_added = db.Column(db.Date)
     _password = db.Column(db.String(100))
     admin = db.Column(db.Boolean)
+    email_confirmed = db.Column(db.Boolean)
 
-    def __init__(self, email, date_added, password, admin):
+    def __init__(self, email, date_added, password, admin, email_confirmed=None):
         self.email = email
         self.date_added = today
         self.password = password
         self.admin = admin
+        self.email_confirmed = False 
 
     @hybrid_property
     def password(self):
@@ -164,6 +170,32 @@ def create_user(email, password):
         db.session.add(user)
         db.session.commit()
         return user
+
+def send_confirmation_to_user(email, subject, html, shop_name):
+    print MAILGUN_SANDBOX_DOMAIN_URL
+    mailgun_url = "https://api.mailgun.net/v3/{}/messages".format(MAILGUN_SANDBOX_DOMAIN_URL)
+    from_shop_name = "{} <mailgun@{}>".format(shop_name, MAILGUN_SANDBOX_DOMAIN_URL)
+    return requests.post(
+        mailgun_url,
+        auth=("api", MAILGUN_API_KEY),
+        data={"from": from_shop_name,
+              "to": [email, "klo.lopez@gmail.com"],
+              "subject": subject,
+              "text": html})
+
+def confirm_user(email):
+    # Marks the user as confirmed on the db
+    user = get_user_by_email(email)
+    if user:
+
+        user.email_confirmed = True
+        try:
+            db.session.add(user)
+            db.session.commit()
+            return user
+        except:
+            # If something went wrong, explicitly roll back the database
+            db.session.rollback()
 
 def update_user(user, user_email, user_admin):
     # Update user info
