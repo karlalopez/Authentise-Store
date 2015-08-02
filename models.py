@@ -171,8 +171,7 @@ def create_user(email, password):
         db.session.commit()
         return user
 
-def send_confirmation_to_user(email, subject, html, shop_name):
-    print MAILGUN_SANDBOX_DOMAIN_URL
+def send_email_to_user(email, subject, html, shop_name):
     mailgun_url = "https://api.mailgun.net/v3/{}/messages".format(MAILGUN_SANDBOX_DOMAIN_URL)
     from_shop_name = "{} <mailgun@{}>".format(shop_name, MAILGUN_SANDBOX_DOMAIN_URL)
     return requests.post(
@@ -215,9 +214,11 @@ def change_user_password(user, user_password):
     user.password = user_password
     try:
         db.session.commit()
+        return user
     except:
         # If something went wrong, explicitly roll back the database
         db.session.rollback()
+        return False
 
 
 def delete_user(id):

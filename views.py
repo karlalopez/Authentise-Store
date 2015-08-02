@@ -29,7 +29,6 @@ def login():
             return render_template('login.html', error="Login credentials don't not work", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
     return render_template('login.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline)
 
-
 @app.route('/logout')
 def logout():
     if current_user.is_authenticated():
@@ -66,16 +65,14 @@ def signup():
 
             html = render_template('email-confirmation.html', confirm_url=confirm_url, shop_name=shop_name, shop_tagline=shop_tagline)
 
-            # Send email confirmation
-            send_confirmation_to_user(form.email.data, subject, html, shop_name)
+            # Send email
+            send_email_to_user(form.email.data, subject, html, shop_name)
 
             return render_template('login.html', message="Your user has been created. Please log in here, and don't forget to check your email to confirm your account.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
         return render_template('signup.html', shop_name=shop_name, shop_tagline=shop_tagline,form=form)
 
 @app.route('/confirm/<token>')
 def confirm_email(token):
-    if token == "signup":
-        return redirect('/login')
 
     form = LoginForm(request.form)
     try:
@@ -90,8 +87,59 @@ def confirm_email(token):
     else:
         return render_template('login.html', error="Your user could not be confirmed. Please contact us.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
 
+@app.route('/forgot', methods=['GET', 'POST'])
+def forgot():
+    form = ForgotPasswordForm(request.form)
+    if request.method == 'POST' and form.validate():
+        user = get_user_by_email(form.email.data)
+        message = "If you have signed up and confirmed this email with us before, please follow the instructions sent to {} to reset your password.".format(form.email.data)
+        if user.email_confirmed == True:
+                        # Now we'll send the email confirmation link
+            subject = "{} - Have you requested a password reset?".format(shop_name)
+
+            token = ts.dumps(form.email.data, salt='recover-key')
+
+            reset_url = url_for(
+                'reset',
+                token=token,
+                _external=True)
+
+            html = render_template(
+                'email-reset.html',
+                reset_url=reset_url, shop_name=shop_name, shop_tagline=shop_tagline)
+
+            # Send email
+            send_email_to_user(form.email.data, subject, html, shop_name)
+
+        return render_template('forgot.html', message=message, form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+        
+    return render_template('forgot.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+
+@app.route('/reset/<token>', methods=['GET', 'POST'])
+def reset(token):
+    try:
+        email = ts.loads(token, salt="recover-key", max_age=86400)
+    except:
+        return redirect('/404')
+    
+    form = ResetPasswordForm(request.form)
+
+    if request.method == 'POST':
+        if form.validate():
+            user = get_user_by_email(email)
+            reset_confirmation = change_user_password(user, form.new_password.data)
+            if reset_confirmation:
+                return render_template('login.html', message="Your password has been changed. Please login in here.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+            else:
+                return render_template('login.html', error="Your password reset did not work. Please contact us.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+        else:
+            return render_template('reset.html', token=token, error="Your password must match", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+    return render_template('reset.html', token=token, form=form, shop_name=shop_name, shop_tagline=shop_tagline)    
+
+
 @app.route('/shop')
 def shop():
+    # Lists all collections and models
     collections = get_collections()
     models = get_models()
     return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)

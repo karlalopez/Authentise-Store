@@ -139,4 +139,3 @@ $ heroku rename my_store_name
 ```
 Now your URL will be 'http://my_store_name.herokuapp.com'.
 
-
