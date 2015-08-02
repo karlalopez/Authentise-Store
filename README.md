@@ -29,10 +29,10 @@ Ubuntu - 'apt-get install postgresql'.
 
 - Now export the variables for your Authentise and Stripe TEST keys:
 ```
-$ export SECRET_KEY=your_stripe_test_secret_key
+$ export STRIPE_SECRET_KEY=your_stripe_test_secret_key
 ```
 ```
-$ export PUBLISHABLE_KEY=your_stripe_test_publishable_key
+$ export STRIPE_PUBLISHABLE_KEY=your_stripe_test_publishable_key
 ```
 ```
 $ export AUTHENTISE_API_KEY=your_authentise_key
