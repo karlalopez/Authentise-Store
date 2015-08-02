@@ -1,0 +1,59 @@
+{% include 'header.html' %}
+<link href="/static/dashboard.css" rel="stylesheet">
+
+{% include 'navbar.html' %}
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+
+            {% if collection_name %}
+                <li><a href="/shop">Home<span class="sr-only">(current)</span></a></li>
+            {% else %}
+                <li class="active"><a href="/shop">Home<span class="sr-only">(current)</span></a></li>
+            {% endif %}
+
+
+            {% for collection in collections %}
+                {% if collection_name == collection.name %}
+                <li class="active"><a href="/collection/{{collection.id}}">{{collection.name}}</a></li>
+                {% else %}
+                <li><a href="/collection/{{collection.id}}">{{collection.name}}</a></li>
+                {% endif %}
+            {% endfor %}
+
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <div class="page-header">
+            <a href="/shop/popularity">Most popular models</a> | <a href="/shop">All models</a>
+          </div>
+          <div class="row placeholders">
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+
+                    A problem ocurred:
+
+                    <p><h1>{{ error }}</h1>
+
+                </div>
+            {% endif %}
+            {% if message %}
+                <div class="alert alert-success" role="alert">
+
+                    {{ message }}
+
+                </div>
+            {% endif %}
+
+            <a href="shop">Go back to shop?</a>
+          </div>
+        </div>
+
+    </div>
+
+    </div>
+
+  </body>
+</html>

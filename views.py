@@ -73,15 +73,16 @@ def signup():
 
 @app.route('/confirm/<token>')
 def confirm_email(token):
-
+    # Account email confirmation
     form = LoginForm(request.form)
     try:
+        # Gets the email out of the token
         email = ts.loads(token, salt="email-confirm-key", max_age=86400)
     except:
         return render_template('login.html', error="Your user could not be confirmed. Please contact us.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
 
+    # Performs the email confirmation
     confirmation = confirm_user(email)
-
     if confirmation:
         return render_template('login.html', message="Your user is now confirmed. Thanks! Please login in here.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
     else:
@@ -89,12 +90,14 @@ def confirm_email(token):
 
 @app.route('/forgot', methods=['GET', 'POST'])
 def forgot():
+    # Sends the reset password email
     form = ForgotPasswordForm(request.form)
     if request.method == 'POST' and form.validate():
+        # Checks if te user exists
         user = get_user_by_email(form.email.data)
-        message = "If you have signed up and confirmed this email with us before, please follow the instructions sent to {} to reset your password.".format(form.email.data)
+
         if user.email_confirmed == True:
-                        # Now we'll send the email confirmation link
+            # If the user exists, puts together the reset password link and email body
             subject = "{} - Have you requested a password reset?".format(shop_name)
 
             token = ts.dumps(form.email.data, salt='recover-key')
@@ -110,30 +113,42 @@ def forgot():
 
             # Send email
             send_email_to_user(form.email.data, subject, html, shop_name)
-
+        
+        # For security reasons, it does not confirm if the email is or is not in the db
+        message = "If you have signed up and confirmed this email with us before, please follow the instructions sent to {} to reset your password.".format(form.email.data)
         return render_template('forgot.html', message=message, form=form, shop_name=shop_name, shop_tagline=shop_tagline)
         
     return render_template('forgot.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/reset/<token>', methods=['GET', 'POST'])
 def reset(token):
+    # Resets user password
     try:
+        # Gets the email out of the token
         email = ts.loads(token, salt="recover-key", max_age=86400)
     except:
+        # Sends to 404 is no user binded to token
         return redirect('/404')
     
     form = ResetPasswordForm(request.form)
 
     if request.method == 'POST':
+        # If POST, proceed to validate form and change password
         if form.validate():
+            # If form validates, retrieves the user
             user = get_user_by_email(email)
+            # Changes password to new password
             reset_confirmation = change_user_password(user, form.new_password.data)
             if reset_confirmation:
+                # If password change goes well, sends user to login
                 return render_template('login.html', message="Your password has been changed. Please login in here.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
             else:
+                # If passwrod change does not go well, sends user to login and asks for contact.
                 return render_template('login.html', error="Your password reset did not work. Please contact us.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
         else:
-            return render_template('reset.html', token=token, error="Your password must match", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+            # Tells the user to match password fields
+            return render_template('reset.html', token=token, error="Your new password must match the confimed password field.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
+    # If GET, loads the reser password form
     return render_template('reset.html', token=token, form=form, shop_name=shop_name, shop_tagline=shop_tagline)    
 
 
@@ -153,6 +168,7 @@ def shop_pop():
 
 @app.route('/search', methods=['POST'])
 def search():
+    # Lists all models that match search param
     collections = get_collections()
     search = request.form.get('term')
     models = search_models(search)
@@ -162,6 +178,7 @@ def search():
 
 @app.route('/collection/<id>')
 def collection(id):
+    # Shows all models in a certain collection ID
     collections = get_collections()
     models = get_models_by_collection(id)
     collection_name = get_collection_name_by_id(id)
@@ -169,6 +186,7 @@ def collection(id):
 
 @app.route('/product/<id>')
 def product(id):
+    # Shows an specific model
     model = get_model_by_id(id)
     if model:
         images = get_images_by_model_id(id)
@@ -567,3 +585,10 @@ def adminusers_delete(id):
                 return redirect('admin-users')
     # If not authenticated and admin, redirects to shop
     return redirect('/shop')
+
+@app.errorhandler(404)
+def not_found(error):
+    # Not found route
+    collections = get_collections()
+    return render_template('error.html', collections=collections, shop_name=shop_name, shop_tagline=shop_tagline, error=error), 404
+
