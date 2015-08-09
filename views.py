@@ -181,7 +181,7 @@ def product(id):
     model = get_model_by_id(id)
     if model:
         images = get_images_by_model_id(id)
-        error = " "
+        error = None
     else:
         error = "Model does not exist."
         images = " "
@@ -216,8 +216,6 @@ def checkout(id):
             currency='usd',
             description='Flask Charge'
         )
-
-        print charge 
 
         # If Stripe paid is okay
         if charge.paid == True:
