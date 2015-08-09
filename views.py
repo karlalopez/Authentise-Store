@@ -53,6 +53,22 @@ def signup():
                 except Exception as e:
                     return render_template('signup.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline, error=e.message)
 
+            # Now we'll send the email confirmation link       
+            subject = "{} - Please confirm your email".format(shop_name)       
+       
+            token = ts.dumps(form.email.data, salt='email-confirm-key')        
+       
+            confirm_url = url_for(     
+                'confirm_email',       
+                token=token,       
+                _external=True)        
+       
+            html = render_template('email-confirmation.html', confirm_url=confirm_url, shop_name=shop_name, shop_tagline=shop_tagline)     
+       
+            # Send email       
+            send_email_to_user(form.email.data, subject, html, shop_name)      
+
+
             return render_template('login.html', message="Your user has been created. Please log in here, and don't forget to check your email to confirm your account.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
         return render_template('signup.html', shop_name=shop_name, shop_tagline=shop_tagline,form=form)
 
