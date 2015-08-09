@@ -234,6 +234,20 @@ def checkout(id):
             # Update order token on the db woth Stripe charge id and Authentise token link
             token = update_token(token, authentise_token, stripe_charge_id)
 
+            # Now we'll send the purchase details to the user by email
+            subject = "Thanks for buying {} at {}!".format(token.model.name, shop_name)
+
+            print_url = url_for(
+                'print_order',
+                id=token.id,
+                _external=True)
+
+            html = render_template('email-token.html', model_name=token.model.name, print_url=print_url, shop_name=shop_name, shop_tagline=shop_tagline)
+
+            # Send email
+            send_email_to_user(current_user.email, subject, html, shop_name)
+
+
             # Render interface to print
             return render_template('checkout.html', authentise_link=authentise_link, image_path=image_path, token=token, email=current_user.email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
         else:
@@ -257,20 +271,6 @@ def print_order(id):
         # Form the Authentise token link
         authentise_link = "http://app.authentise.com/#/widget/{}".format(token.authentise_token)
             
-        # Now we'll send the email confirmation link
-
-        print_url = url_for(
-                'print_order',
-                id=token.id,
-                _external=True)
-
-        subject = "Thank you for shopping at {}!".format(shop_name)
-
-        html = render_template('email-token.html', model_name=token.model.name, print_link=print_link, shop_name=shop_name, shop_tagline=shop_tagline)
-
-        # Send email
-        send_email_to_user(current_user.email, subject, html, shop_name)
-
         return render_template('checkout.html', image_path=image_path, token=token, authentise_link=authentise_link, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
     # If user is not authenticated, render login
     else:
