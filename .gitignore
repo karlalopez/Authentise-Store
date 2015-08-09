@@ -61,3 +61,4 @@ target/
 models/
 uploads/
 venv/
+authentise-store.sh
