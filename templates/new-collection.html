@@ -20,6 +20,15 @@
             <a href="/admin">Home</a> / <a href="/admin-collections">Collections</a> / Add new collection
           </div>
           <div class="row">
+            {% if error %}
+              <div class="alert alert-danger" role="alert">
+
+                An error occurred when trying to create a collection:
+
+                {{ error }}
+
+              </div>
+            {% endif %}            
             <div class="col-md-12">
               <form action="/admin-collections/new" method="POST">
 
@@ -41,16 +50,6 @@
 
 
               </form>
-
-              {% if error %}
-              <div class="alert alert-danger" role="alert">
-
-                An error occurred trying to create a collection:
-
-                {{ error }}
-
-              </div>
-              {% endif %}
 
             </div>
           </div>

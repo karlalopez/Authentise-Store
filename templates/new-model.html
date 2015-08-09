@@ -20,6 +20,15 @@
             <a href="/admin">Home</a> / <a href="/admin-models">Models</a> / Add new model
           </div>
           <div class="row">
+          {% if error %}
+              <div class="alert alert-danger" role="alert">
+
+                  A problem ocurred when trying to create a model:
+
+                  {{ error }}
+
+              </div>
+          {% endif %}
             <div class="col-md-12">
               <form action="/admin-models/new" method="POST" enctype="multipart/form-data">
 

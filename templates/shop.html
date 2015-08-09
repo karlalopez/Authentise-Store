@@ -28,6 +28,15 @@
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          {% if error %}
+              <div class="alert alert-danger" role="alert">
+
+                  A problem ocurred with your sign up:
+
+                  {{ error }}
+
+              </div>
+          {% endif %}
           <div class="page-header">
             <a href="/shop/popularity">Most popular models</a> | <a href="/shop">All models</a>
           </div>

@@ -25,6 +25,15 @@
         {% if authentise_link %}
 
         <div class="col-md-9 col-md-offset-2 main">
+        {% else %}
+            <div class="alert alert-danger" role="alert">
+
+            Purchase not completed. <a href="/shop">Back</a>
+
+            {{ error }}
+
+            </div>
+        {% endif %}          
           <div class="row">
             <div class="col-md-6 col-sm-3">
               <img src="{{image_path}}" class="img-responsive" alt="{{token.model.name}}"><br>
@@ -34,16 +43,6 @@
             <iframe src="{{authentise_link}}" width="400" height="400"></iframe>
           </div>
         </div>
-        {% else %}
-            <div class="alert alert-danger" role="alert">
-
-            Purchase not completed. <a href="/shop">Back</a>
-
-            {{ error }}
-
-            </div>
-        {% endif %}
-
       </div>
     </div>
   </body>

@@ -20,7 +20,16 @@
             <a href="/admin">Home</a> / <a href="/admin-users">Users</a> / Add new user
           </div>
           <div class="row">
-            <div class="col-md-12">
+          {% if error %}
+              <div class="alert alert-danger" role="alert">
+
+                  A problem ocurred when trying to create or update user:
+
+                  {{ error }}
+
+              </div>
+          {% endif %}            
+            <div class="col-md-12">              
               <form action="/admin-users/new" method="POST">
 
                 <div class="form-group">
@@ -41,16 +50,6 @@
               <p><input type="submit" placeholder="Save" class="btn btn-success"/> <a href="/admin-users" class="btn btn-default">Back</a>
 
               </form>
-
-              {% if error %}
-              <div class="alert alert-danger" role="alert">
-
-                An error occurred trying to create a user:
-
-                {{ error }}
-
-              </div>
-              {% endif %}
 
             </div>
           </div>

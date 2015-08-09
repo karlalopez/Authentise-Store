@@ -179,7 +179,7 @@ def search():
     search = request.form.get('term')
     models = search_models(search)
     if models == []:
-        return render_template('shop.html', error="Sorry, no matched to your search.", email=email, models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+        return render_template('shop.html', error="Sorry, no matched to your search.", models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
     return render_template('shop.html', models=models, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
 @app.route('/collection/<id>')
@@ -188,7 +188,7 @@ def collection(id):
     collections = get_collections()
     models = get_models_by_collection(id)
     collection_name = get_collection_name_by_id(id)
-    return render_template('shop.html', email=email, models=models, collections=collections, collection_name=collection_name)
+    return render_template('shop.html', models=models, collections=collections, collection_name=collection_name)
 
 @app.route('/product/<id>')
 def product(id):
@@ -367,7 +367,7 @@ def adminmodels_view(id):
             collections = get_collections()
             # If it's a GET, render template with model info
             if request.method == 'GET':
-                return render_template('view-model.html', email=email, model=model, collections=collections, images=images, shop_name=shop_name, shop_tagline=shop_tagline)
+                return render_template('view-model.html', model=model, collections=collections, images=images, shop_name=shop_name, shop_tagline=shop_tagline)
             # If POST, use the info to update the model
             model_name = request.form.get('model_name_field')
             model_description = request.form.get('model_description_field')
@@ -379,7 +379,7 @@ def adminmodels_view(id):
                 model_to_update = update_model(model, model_name, model_description, model_dimensions, model_collection, model_price)
                 return redirect('admin-models')
             except Exception as e:
-                return render_template('view-model.html', error=e.message, email=email, model=model, collections=collections, images=images, shop_name=shop_name, shop_tagline=shop_tagline)
+                return render_template('view-model.html', error=e.message, model=model, collections=collections, images=images, shop_name=shop_name, shop_tagline=shop_tagline)
     # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
@@ -391,7 +391,7 @@ def adminmodels_new():
         if user.admin == True:
             # If GET render template to add new model
             if request.method == 'GET':
-                return render_template('new-model.html', email=email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+                return render_template('new-model.html', collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
             # If POST, use the info to create a new model
             model_name = request.form.get('model_name_field')
@@ -410,7 +410,7 @@ def adminmodels_new():
                 # Save images to the Uploads dir and add their paths to the images table on the db
                 images = save_images(model_to_create, request.files['model_image1_field'],request.files['model_image2_field'], request.files['model_image3_field'], request.files['model_image4_field'], request.files['model_image5_field'])
             except Exception as e:
-                return render_template('new-model.html', error=e.message, email=email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+                return render_template('new-model.html', error=e.message, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
 
     # If not authenticated and admin, redirects to shop
     return redirect('/admin-models')
@@ -439,7 +439,7 @@ def admincollections():
         user = get_user_by_email(current_user.email)
         if user.admin == True:
             collections = get_collections()
-            return render_template('admin-collections.html', email=email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+            return render_template('admin-collections.html', collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
     # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
@@ -452,7 +452,7 @@ def admincollections_view(id):
             collection = get_collection_by_id(id)
             if request.method == 'GET':
                 # If GET, render template with collection info
-                return render_template('view-collection.html', email=email, collection=collection, shop_name=shop_name, shop_tagline=shop_tagline)
+                return render_template('view-collection.html', collection=collection, shop_name=shop_name, shop_tagline=shop_tagline)
             # If POST, use the info to update collection
             collection_name = request.form.get('collection_name_field')
             collection_description = request.form.get('collection_description_field')
@@ -461,7 +461,7 @@ def admincollections_view(id):
                 collection_to_update = update_collection(collection, collection_name, collection_description)
                 return redirect('admin-collections')
             except Exception as e:
-                return render_template('view-collection.html', error=e.message, email=email, collection=collection, shop_name=shop_name, shop_tagline=shop_tagline)
+                return render_template('view-collection.html', error=e.message, collection=collection, shop_name=shop_name, shop_tagline=shop_tagline)
     # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
@@ -529,7 +529,7 @@ def adminorder_view(id):
             # Render template with order info
             token = get_token_by_id(id)
             token_status = get_token_print_status(token.authentise_token)
-            return render_template('view-order.html', email=email, token=token, token_status=token_status, shop_name=shop_name, shop_tagline=shop_tagline)
+            return render_template('view-order.html', token=token, token_status=token_status, shop_name=shop_name, shop_tagline=shop_tagline)
     # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
@@ -543,7 +543,7 @@ def adminusers():
         user = get_user_by_email(current_user.email)
         if user.admin == True:
             users = get_users()
-            return render_template('admin-users.html', email=email, users=users, shop_name=shop_name, shop_tagline=shop_tagline)
+            return render_template('admin-users.html', users=users, shop_name=shop_name, shop_tagline=shop_tagline)
     # If not authenticated and admin, redirects to shop
     return redirect('/shop')
 
@@ -556,7 +556,7 @@ def adminusers_view(id):
             # If GET, render template with user info
             if request.method == 'GET':
                 user_to_view = get_user_by_id(id)
-                return render_template('view-user.html', email=email, user=user_to_view, shop_name=shop_name, shop_tagline=shop_tagline)
+                return render_template('view-user.html', user=user_to_view, shop_name=shop_name, shop_tagline=shop_tagline)
             # If POST, use the info to update user
             user_email = request.form.get('user_email_field')
             user_admin = request.form.get('user_admin_field')
