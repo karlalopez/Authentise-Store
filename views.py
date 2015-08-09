@@ -53,21 +53,6 @@ def signup():
                 except Exception as e:
                     return render_template('signup.html', form=form, shop_name=shop_name, shop_tagline=shop_tagline, error=e.message)
 
-            # Now we'll send the email confirmation link
-            subject = "{} - Please confirm your email".format(shop_name)
-
-            token = ts.dumps(form.email.data, salt='email-confirm-key')
-
-            confirm_url = url_for(
-                'confirm_email',
-                token=token,
-                _external=True)
-
-            html = render_template('email-confirmation.html', confirm_url=confirm_url, shop_name=shop_name, shop_tagline=shop_tagline)
-
-            # Send email
-            send_email_to_user(form.email.data, subject, html, shop_name)
-
             return render_template('login.html', message="Your user has been created. Please log in here, and don't forget to check your email to confirm your account.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
         return render_template('signup.html', shop_name=shop_name, shop_tagline=shop_tagline,form=form)
 
@@ -90,6 +75,9 @@ def confirm_email(token):
 
 @app.route('/forgot', methods=['GET', 'POST'])
 def forgot():
+    if current_user.is_authenticated():
+        return redirect('/shop')
+
     # Sends the reset password email
     form = ForgotPasswordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -188,6 +176,7 @@ def collection(id):
 
 @app.route('/product/<id>')
 def product(id):
+
     # Shows an specific model
     model = get_model_by_id(id)
     if model:
@@ -217,7 +206,7 @@ def checkout(id):
 
         # Create customer on Stripe
         customer = stripe.Customer.create(
-            email=email,
+            email=current_user.email,
             card=request.form['stripeToken']
         )
         # Create charge on Stripe
@@ -228,26 +217,30 @@ def checkout(id):
             description='Flask Charge'
         )
 
-        # Create order token on the db
-        token = create_token(model.price, model.id, email)
+        print charge 
 
         # If Stripe paid is okay
-        if charge.status == 'paid':
+        if charge.paid == True:
             stripe_charge_id = charge.id
-            # Update model popularity
-            popularity = update_model_popularity(model)
+ 
+            # Create order token on the db
+            token = create_token(model.price, model.id, current_user.email)
+
             # Create Authentise token link
             token_link = create_authentise_token(model,token)
             authentise_token, authentise_link = token_link
+
+            # Update model popularity
+            popularity = update_model_popularity(model)
 
             # Update order token on the db woth Stripe charge id and Authentise token link
             token = update_token(token, authentise_token, stripe_charge_id)
 
             # Render interface to print
-            return render_template('checkout.html', authentise_link=authentise_link, image_path=image_path, token=token, email=email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
+            return render_template('checkout.html', authentise_link=authentise_link, image_path=image_path, token=token, email=current_user.email, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
         else:
             error = "We are very sorry, but there was a problem with your purchase. Please try again."
-            return render_template('product.html', email=email, model=model, collections=collections, error=error, shop_name=shop_name, shop_tagline=shop_tagline)
+            return render_template('product.html', images=images, email=current_user.email, model=model, collections=collections, error=error, shop_name=shop_name, shop_tagline=shop_tagline)
 
     else:
         # If user is not authenticated, render login
@@ -266,6 +259,20 @@ def print_order(id):
         # Form the Authentise token link
         authentise_link = "http://app.authentise.com/#/widget/{}".format(token.authentise_token)
             
+        # Now we'll send the email confirmation link
+
+        print_url = url_for(
+                'print_order',
+                id=token.id,
+                _external=True)
+
+        subject = "Thank you for shopping at {}!".format(shop_name)
+
+        html = render_template('email-token.html', model_name=token.model.name, print_link=print_link, shop_name=shop_name, shop_tagline=shop_tagline)
+
+        # Send email
+        send_email_to_user(current_user.email, subject, html, shop_name)
+
         return render_template('checkout.html', image_path=image_path, token=token, authentise_link=authentise_link, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
     # If user is not authenticated, render login
     else:

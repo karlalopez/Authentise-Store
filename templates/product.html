@@ -7,6 +7,7 @@
 
     <div class="container-fluid">
       <div class="row">
+
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li class="active"><a href="/shop">Home<span class="sr-only">(current)</span></a></li>
@@ -22,6 +23,15 @@
         </div>
 
         <div class="col-md-9 col-md-offset-2 main">
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+
+                A problem ocurred:
+
+                {{ error }}
+
+            </div>
+        {% endif %}
           <div class="row">
             {% if model %}
                   <div class="col-md-6 col-sm-3">
@@ -36,7 +46,7 @@
                   </div>
                   <div class="col-md-2 col-sm-3">
                     <p>
-                      {% if email %}
+                      {% if current_user.is_authenticated() %}
 
                             <form action="/checkout/{{model.id}}" method="POST">
                               <script
