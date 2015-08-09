@@ -22,7 +22,7 @@ def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         user = get_user_by_email(form.email.data)
-        if user.is_correct_password(form.password.data):
+        if user and user.is_correct_password(form.password.data):
             login_user(user)
             return redirect('/shop')
         else:
@@ -141,9 +141,11 @@ def reset(token):
             reset_confirmation = change_user_password(user, form.new_password.data)
             if reset_confirmation:
                 # If password change goes well, sends user to login
+                form = LoginForm(request.form)
                 return render_template('login.html', message="Your password has been changed. Please login in here.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
             else:
-                # If passwrod change does not go well, sends user to login and asks for contact.
+                # If password change does not go well, sends user to login and asks for contact.
+                form = LoginForm(request.form)
                 return render_template('login.html', error="Your password reset did not work. Please contact us.", form=form, shop_name=shop_name, shop_tagline=shop_tagline)
         else:
             # Tells the user to match password fields
@@ -263,7 +265,7 @@ def print_order(id):
 
         # Form the Authentise token link
         authentise_link = "http://app.authentise.com/#/widget/{}".format(token.authentise_token)
-
+            
         return render_template('checkout.html', image_path=image_path, token=token, authentise_link=authentise_link, collections=collections, shop_name=shop_name, shop_tagline=shop_tagline)
     # If user is not authenticated, render login
     else:
