@@ -4,11 +4,13 @@ This is an example of very simple example of an e-commerce website to sell desig
 
 It's a work in progress, has a lot of restrictions and is meant for people to use it as a starting point for people building their own stores.
 
-In addition to Authentise, the services used are: Stripe, Mailgun, and Heroku
+In addition to Authentise, the services used are: Stripe, Mailgun, and Heroku.
 
 Learn more about Authentise design streaming at http://authentise.com/tech.
 
 Please leave your comments and suggestions. Feedback and pull requests are very welcome.
+
+Special thanks to Jennie Lees. Most of this code was written under her watch and pretty much all this wonderful step-by-step tutorial has been written by her. Visit her portifolio: http://jennielees.github.io.
 
 # Running locally
 
