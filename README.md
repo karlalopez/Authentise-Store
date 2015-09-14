@@ -1,5 +1,16 @@
 # Authentise-Store
 
+This is an example of very simple example of an e-commerce website to sell designs for 3D printing using Authentise design streaming.
+
+It's a work in progress, has a lot of restrictions and is meant for people to use it as a starting point for people building their own stores.
+
+In addition to Authentise, the services used are: Stripe, Mailgun, and Heroku
+
+Learn more about Authentise design streaming at http://authentise.com/tech.
+
+Please leave your comments and suggestions. Feedback and pull requests are very welcome.
+
+# Running locally
 
 First, get it ready to run locally:
 
