@@ -18,6 +18,10 @@ Mac - http://postgresapp.com/
 Windows - http://www.postgresql.org/download/windows/
 Ubuntu - 'apt-get install postgresql'.
 
+- On Terminal, type psql.
+
+```$ psql``` 
+
 - If you don't have a Github account, create one. If you don't know Git, do a quick online tutorial to figure out how it works. Help: try.github.io
 
 - Fork this repo, and then clone it locally. Help: https://help.github.com/articles/fork-a-repo/
