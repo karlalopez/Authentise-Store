@@ -10,7 +10,7 @@ Learn more about Authentise design streaming at http://authentise.com/tech.
 
 Please leave your comments and suggestions. Feedback and pull requests are very welcome.
 
-Special thanks to Jennie Lees. Most of this code was written under her watch and pretty much all this wonderful step-by-step tutorial has been written by her. Visit her portifolio: http://jennielees.github.io.
+Special thanks to Jennie Lees. Most of this code was written under her watch and pretty much all this wonderful step-by-step tutorial has been written by her. Visit her portfolio: http://jennielees.github.io.
 
 # Running locally
 
