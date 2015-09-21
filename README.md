@@ -36,7 +36,14 @@ Ubuntu - 'apt-get install postgresql'.
 ```
 $ psql
 ``` 
-
+- Now create the database typing:
+``` 
+create database numbers;
+``` 
+- To exit postgres just type:
+``` 
+\q
+``` 
 - If you don't have a Github account, create one. If you don't know Git, do a quick online tutorial to figure out how it works. Help: try.github.io
 
 - Fork this repo, and then clone it locally. Help: https://help.github.com/articles/fork-a-repo/
