@@ -38,7 +38,7 @@ $ psql
 ``` 
 - Now create the database typing:
 ``` 
-create database numbers;
+create database store;
 ``` 
 - To exit postgres just type:
 ``` 
