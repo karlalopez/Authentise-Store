@@ -118,7 +118,7 @@ class User(db.Model, UserMixin):
         self.date_added = today
         self.password = password
         self.admin = admin
-        self.email_confirmed = False 
+        self.email_confirmed = False
 
     @hybrid_property
     def password(self):
@@ -178,7 +178,7 @@ def send_email_to_user(email, subject, html, shop_name):
         mailgun_url,
         auth=("api", MAILGUN_API_KEY),
         data={"from": from_shop_name,
-              "to": [email, "klo.lopez@gmail.com"],
+              "to": [email],
               "subject": subject,
               "text": html})
 
