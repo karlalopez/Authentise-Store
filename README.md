@@ -2,7 +2,7 @@
 
 www.authentise.com
 
-This is an example of very simple example of an e-commerce website to sell designs for 3D printing using Authentise design streaming.
+This is a very simple example of an e-commerce website to sell designs for 3D printing using Authentise design streaming.
 
 It's a work in progress, has a lot of restrictions and is meant to be a starting point for people building their own stores.
 
