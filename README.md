@@ -127,10 +127,10 @@ To make sure it's done, display the file content doing:
 ```
 $ cat Procfile
 ```
-Check this works with 'foreman':
+Check this works with 'heroku local':
 
 ```
-$ foreman start
+$ heroku local
 ```
 
 - If everything is fine, add 'Procfile' to the git repo.
