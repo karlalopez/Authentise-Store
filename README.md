@@ -143,11 +143,29 @@ $ git commit -m "Getting ready for Heroku"
 ```
 $ heroku create
 ```
+
+- Export the needed credentials as variables:
+```
+$ heroku config:set  STRIPE_SECRET_KEY="your_stripe_TEST_secret_key"
+```
+```
+$ heroku config:set  STRIPE_PUBLISHABLE_KEY="your_stripe_TEST_publishable_key"
+```
+```
+$ heroku config:set  AUTHENTISE_API_KEY="your_authentise_key"
+```
+```
+$ heroku config:set  MAILGUN_API_KEY="your_mailgun_api_key"
+```
+```
+$ heroku config:set  MAILGUN_SANDBOX_DOMAIN_URL="your_mailgun_sandbox_domain_url"
+```
+
 - To deploy, push the code via Git:
 ```
 $ git push heroku
 ```
-- Wwhen the deploy is done, you should see the URL of your new Heroku app:
+- When the deploy is done, you should see the URL of your new Heroku app:
 ```
 remote: -----> Discovering process types
 remote:        Procfile declares types -> web
